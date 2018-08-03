@@ -61,7 +61,7 @@ class SettingsController extends ApiControllerBase
                 
                 if('awss3' == $data['settings']['Provider']) {
                     $configd_run = sprintf(
-                            "configsync aws_test_parameters %s %s %s %s", 
+                            "configsync awss3_test_parameters --key_id=%s --key_secret=%s --bucket=%s --path=%s", 
                             $data['settings']['ProviderKey'],
                             $data['settings']['ProviderSecret'],
                             $data['settings']['StorageBucket'],

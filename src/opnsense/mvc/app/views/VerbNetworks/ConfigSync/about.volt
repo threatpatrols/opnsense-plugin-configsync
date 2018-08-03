@@ -33,7 +33,6 @@
                 "s3:ListBucket",
                 "s3:PutObject",
                 "s3:GetObject",
-                "s3:DeleteObject"
             ],
             "Resource": [
                 "arn:aws:s3:::BUCKET_NAME/PATH_IN_BUCKET/*"

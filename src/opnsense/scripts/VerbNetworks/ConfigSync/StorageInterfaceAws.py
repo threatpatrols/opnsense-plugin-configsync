@@ -135,7 +135,6 @@ class StorageInterfaceAws(StorageInterface):
 
             try:
                 content, meta = self.read_consistent(source_path, return_meta=['mtime', 'md5', 'bytes'])
-                mtime = os.path.getmtime(source_path)
             except(Exception) as e:
                 return {
                     'status': 'fail',

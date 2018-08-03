@@ -25,7 +25,7 @@ deploy_file()
     local dst_file=${2}
     echo "${src_file}"
     ssh $remote "mkdir -p \"\`dirname ${remote_opnsense_base_path}/${dst_file}\`\""
-    rsync -a "${local_opnsense_path}/${src_file}" "${remote_opnsense_path}/${dst_file}"
+    rsync -a --no-o --no-g "${local_opnsense_path}/${src_file}" "${remote_opnsense_path}/${dst_file}"
 }
 
 remove_file()
@@ -37,19 +37,30 @@ remove_file()
 configure_plugins()
 {
     ssh $remote "/usr/local/etc/rc.configure_plugins"
-    
-    # service configd restart
-    # configctl template reload VerbNetworks/ConfigSync
+}
+
+reload_config()
+{
+    ssh $remote "configctl template reload VerbNetworks/ConfigSync"
+}
+
+deploy_service()
+{
+    rsync -a --no-o --no-g "${local_opnsense_path}/../bin/configsync-monitord" "${remote}:/usr/local/sbin/configsync-monitord"
+    rsync -a --no-o --no-g "${local_opnsense_path}/../etc/rc.d/configsync" "${remote}:/usr/local/etc/rc.d/configsync"
+    rsync -a --no-o --no-g "${local_opnsense_path}/../etc/inc/plugins.inc.d/configsync.inc" "${remote}:/usr/local/etc/inc/plugins.inc.d/configsync.inc"
 }
 
 cd ${local_opnsense_path}
 for filename_find in $(find . -type f -not -name *.pyc); do
     filename=$(echo $filename_find | sed 's/^..//')
-    if [ $action = "install" ]; then
-        deploy_file ${filename} ${filename}
-    else
+    if [ $action = "remove" ]; then
         remove_file ${filename}
+    else
+        deploy_file ${filename} ${filename}
     fi
 done
 
 configure_plugins
+reload_config
+deploy_service

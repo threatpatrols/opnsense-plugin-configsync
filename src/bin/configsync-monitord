@@ -1,0 +1,238 @@
+#!/usr/local/bin/python2.7
+
+import os
+import sys
+import time
+import json
+import argparse
+import subprocess
+import ConfigParser
+
+#
+# NB: pympler can be used to check and confirm this tool does not have memory leaks, uncomment to activate
+#
+# from pympler import muppy
+# from pympler import summary
+#
+
+
+CONFIGSYNCMONITORD_PIDFILE='/var/run/configsync-monitord.pid'
+
+
+class ConfigSyncMonitordException(Exception):
+    pass
+
+
+class ConfigSyncMonitord(object):
+
+    config_file = None
+    config_mtime = None
+    enabled = None
+    monitors = None
+    interval = None
+    debug = None
+
+    def __init__(self):
+        pass
+
+    def main(self):
+
+        parser = argparse.ArgumentParser(description='configsync-monitord')
+        parser.add_argument('--config', '-c', type=str, metavar='<config-file>', required=True, help='Configuration file to use and load')
+        parser.add_argument('--foreground', '-F', action='store_true', help='Prevent running as a daemon, keeps process in foreground')
+        parser.add_argument('--pid', '-p', type=str, metavar='<pidfile>', default=CONFIGSYNCMONITORD_PIDFILE, help='PID file location other than {} default'.format(CONFIGSYNCMONITORD_PIDFILE))
+        parser.add_argument('--debug', '-d', action='store_true', help='Enable debug logging output')
+        args = parser.parse_args()
+
+        return_code = 0
+        if args.foreground is False:
+            return_code = self.daemonize()
+            if args.pid is not None:
+                with open(args.pid, 'w') as f:
+                    f.write(str(os.getpid()))
+
+        self.log('info', 'configsync-monitord start')
+
+        self.config_file = args.config
+        self.reload_config()
+
+        self.debug = args.debug
+
+        if self.enabled is not True:
+            self.log('info', 'Service is not enabled, exiting')
+            return None
+
+        if os.uname()[0].lower() == 'freebsd':
+            self.log('debug', 'Confirmed running on a FreeBSD based system')
+            md5bin = 'md5'
+        else:
+            self.log('debug', 'Assuming running on a Linux based system')
+            md5bin='md5sum'
+
+        monitor_checksums = []
+
+        self.log('debug', 'Establishing initial checksums before entering monitoring loop')
+        for index, monitor in enumerate(self.monitors):
+            checksum = self.command_shell('{} {} | sort | {} | cut -d" " -f1'.format(md5bin, monitor['pattern'], md5bin))
+            self.log('debug', 'Initial checksum for pattern {} is {}'.format(monitor['pattern'], checksum))
+            if index not in monitor_checksums:
+                monitor_checksums.append(checksum)
+            else:
+                monitor_checksums[index] = checksum
+
+        self.log('debug', 'Entering the monitor loop for detecting changes')
+        while True:
+
+            if self.config_mtime != os.path.getmtime(self.config_file):
+                self.reload_config()
+
+            if self.enabled is not True:
+                self.log('info', 'Service has been disabled, exiting now')
+                break
+
+            for index, monitor in enumerate(self.monitors):
+                checksum = self.command_shell('{} {} | sort | {} | cut -d" " -f1'.format(md5bin, monitor['pattern'], md5bin))
+                if checksum != monitor_checksums[index]:
+                    self.log('info', 'Change detected on pattern {}'.format(monitor['pattern']))
+                    try:
+                        response = self.command_shell(self.monitors[index]['action'])
+                        response_unpacked = json.loads(response)
+                        self.log('debug', 'Action success on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
+                    except ValueError:
+                        self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=response)
+                    except ConfigSyncMonitordException as e:
+                        self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=str(e))
+                monitor_checksums[index] = checksum
+
+            if 'pympler' in sys.modules:
+                # NB: see comments with-respect-to pympler usage in testing for memory leaks
+                all_objects = muppy.get_objects()
+                summary.print_(summary.summarize(all_objects))
+                print('all_objects length: {}'.format(len(all_objects)))
+                del all_objects
+
+            self.log('debug', 'Sleeping {} seconds'.format(self.interval))
+            time.sleep(self.interval)
+        sys.exit(return_code)
+
+    def command_shell(self, command):
+        self.log('debug', 'command_shell', data=command)
+
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+
+        if stderr is not None and len(stderr) > 0:
+            raise ConfigSyncMonitordException(stderr.strip())
+
+        return stdout.strip()
+
+    def reload_config(self):
+        self.log('info', 'reload_config', data=self.config_file)
+
+        if not os.path.isfile(self.config_file):
+            raise ConfigSyncMonitordException('Unable to find configuration file', self.config_file)
+
+        config = ConfigParser.ConfigParser()
+        config.read(self.config_file)
+
+        if 'monitord' not in config.sections():
+            raise ConfigSyncMonitordException('Unable to locate required configuration section', 'monitord')
+
+        self.config_mtime = os.path.getmtime(self.config_file)
+        self.log('debug', 'configuration file modify time', data=self.config_mtime)
+
+        monitor_configurations = {}
+        for option, value in config.items('monitord'):
+            if option.lower() == 'enabled':
+                self.enabled = True if int(value) == 1 else False
+                self.log('debug', 'configuration enabled', data=self.enabled)
+            elif option.lower() == 'interval':
+                self.interval = int(value)
+                self.log('debug', 'configuration interval', data=self.interval)
+            else:
+                monitor_configurations[option.lower()] = value
+
+        self.monitors = []
+        for index in range(0, (len(monitor_configurations)/2 + 1)):
+            pattern_key = 'checksumpattern_{}'.format(index)
+            action_key = 'action_{}'.format(index)
+            if pattern_key not in monitor_configurations.keys() or action_key not in monitor_configurations.keys():
+                continue
+            self.monitors.append(
+                {'pattern': monitor_configurations[pattern_key], 'action': monitor_configurations[action_key]}
+            )
+        self.log('debug', 'configuration monitors', data=self.monitors)
+
+    def log(self, level, message, data=None):
+        level = level.lower()
+
+        if level not in ['debug', 'info', 'warn', 'error', 'fatal']:
+            level = 'info'
+
+        log_event = {
+            'level': level,
+            'message': message,
+            'timestamp': time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+        }
+
+        if data is not None:
+            log_event['data'] = data
+
+        if level == 'debug':
+            if self.debug is True:
+                sys.stderr.write(json.dumps(log_event) + '\n')
+        else:
+            sys.stderr.write(json.dumps(log_event) + '\n')
+
+        sys.stderr.flush()
+        return log_event
+
+    def daemonize(self):
+        """
+        http://code.activestate.com/recipes/278731-creating-a-daemon-the-python-way/
+        """
+
+        UMASK = 0
+        WORKDIR = "/"
+        MAXFD = 1024
+        REDIRECT_TO = os.devnull
+
+        try:
+            pid = os.fork()
+        except OSError, e:
+            raise Exception, "%s [%d]" % (e.strerror, e.errno)
+
+        if pid == 0:  # The first child.
+            os.setsid()
+            try:
+                pid = os.fork()  # Fork a second child.
+            except OSError, e:
+                raise Exception, "%s [%d]" % (e.strerror, e.errno)
+
+            if pid == 0:  # The second child.
+                os.chdir(WORKDIR)
+                os.umask(UMASK)
+            else:
+                os._exit(0)  # Exit parent (the first child) of the second child.
+        else:
+            os._exit(0)  # Exit parent of the first child.
+
+        import resource  # Resource usage information.
+        maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+        if maxfd == resource.RLIM_INFINITY:
+            maxfd = MAXFD
+
+        for fd in range(0, maxfd):
+            try:
+                os.close(fd)
+            except OSError:  # ERROR, fd wasn't open to begin with (ignored)
+                pass
+
+        os.open(REDIRECT_TO, os.O_RDWR)  # standard input (0)
+        os.dup2(0, 1)  # standard output (1)
+        os.dup2(0, 2)  # standard error (2)
+        return (0)
+
+
+if __name__ == '__main__':
+    ConfigSyncMonitord().main()
