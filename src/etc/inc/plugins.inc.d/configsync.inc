@@ -33,7 +33,7 @@ function configsync_syslog()
     $logfacilities = array();
 
     $logfacilities['configsync'] = array(
-        'facility' => array('configsync', 'configsync-monitordaemon', 'configsync-awss3'),
+        'facility' => array('configsync', 'configsync-monitordaemon'),
     );
 
     return $logfacilities;

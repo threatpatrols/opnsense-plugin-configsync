@@ -10,6 +10,7 @@ import hashlib
 import StringIO
 import subprocess
 import ConfigParser
+from calendar import timegm
 
 from xmltodict import xmltodict
 
@@ -174,3 +175,42 @@ class StorageInterface(object):
 
         print (json.dumps(response_data))
         return response_data
+
+    def normalize_timestamp(self, input):
+
+        # oh just kill me now :( every part of this is just horrible
+
+        try:
+            input = str(input)
+
+            # 2018-08-04T07:46:37.000Z
+            if '-' in input and 'T' in input and ':' in input and '.' in input and input.endswith('Z'):
+                t = time.strptime(input.split('.')[0], '%Y-%m-%dT%H:%M:%S')
+
+            # 2018-08-04T07:44:45Z
+            elif '-' in input and 'T' in input and ':' in input and '.' not in input and input.endswith('Z'):
+                t = time.strptime(input, '%Y-%m-%dT%H:%M:%SZ')
+
+            # 20180804T074445Z
+            elif '-' not in input and 'T' in input and ':' not in input and '.' not in input and input.endswith(
+                    'Z'):
+                t = time.strptime(input, '%Y%m%dT%H%M%SZ')
+
+            # 20180804Z074445
+            elif '-' not in input and 'T' not in input and ':' not in input and '.' not in input and 'Z' in input:
+                t = time.strptime(input, '%Y%m%dZ%H%M%S')
+
+            # 1533373930.983988
+            elif '-' not in input and 'T' not in input and ':' not in input and '.' in input and 'Z' not in input:
+                t = time.gmtime(int(input.split('.')[0]))
+
+            # 1533378888
+            elif '-' not in input and 'T' not in input and ':' not in input and '.' not in input and 'Z' not in input:
+                t = time.gmtime(int(input))
+
+        except ValueError as e:
+            return input
+
+        #return time.strftime('%Y-%m-%d %H:%M:%S', t)
+        #return time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.mktime(t)))
+        return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timegm(t)))

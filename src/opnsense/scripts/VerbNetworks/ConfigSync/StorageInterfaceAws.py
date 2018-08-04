@@ -17,7 +17,7 @@ class StorageInterfaceAws(StorageInterface):
 
     storage_configs_full_path='{storage_path}/{hostname}'
     storage_use_gzip_encoding=True
-    aws_request_timeout = 30
+    aws_request_timeout = 60    # NB: list_objects can take a long time when there are a large number of items to page through
 
     __aws_key_id = None
     __aws_key_secret = None
@@ -25,7 +25,11 @@ class StorageInterfaceAws(StorageInterface):
     def main(self):
 
         parser = argparse.ArgumentParser(description='AWS S3 storage interface for ConfigSync')
-        parser.add_argument('action', type=str, choices=['test_parameters', 'sync_config_current', 'sync_config_missing'], help='Interface action requested')
+        parser.add_argument('action',
+            type=str,
+            choices=['test_parameters', 'sync_config_current', 'sync_config_missing', 'get_file_list', 'update_meta_file_list'],
+            help='Interface action requested'
+        )
         parser.add_argument('--key_id', type=str, help='AWS key id')
         parser.add_argument('--key_secret', type=str, help='AWS key secret')
         parser.add_argument('--bucket', type=str, help='AWS S3 bucket name')
@@ -45,8 +49,26 @@ class StorageInterfaceAws(StorageInterface):
             return self.sync_config_current()
         elif args.action == 'sync_config_missing':
             return self.sync_config_missing()
+        elif args.action == 'get_file_list':
+            return self.get_file_list()
+        elif args.action == 'update_meta_file_list':
+            return self.update_meta_file_list()
 
         return {'status': 'fail', 'message': 'Unable to invoke StorageInterfaceAws of ConfigSync'}
+
+    def get_file_list(self):
+        config = self.read_config('awss3')
+
+        if config is None:
+            return {'status': 'fail', 'message': 'No configuration for awss3 available' }
+
+        self.__aws_key_id = config['providerkey']
+        self.__aws_key_secret = config['providersecret']
+
+        return self.list_objects(bucket=config['storagebucket'], path=config['storagepath'], inject_local_metadata=True)
+
+    def update_meta_file_list(self):
+        pass
 
     def test_parameters(self, key_id, key_secret, bucket, path):
 
@@ -111,9 +133,6 @@ class StorageInterfaceAws(StorageInterface):
 
         if config is None:
             return {'status': 'fail', 'message': 'No configuration for awss3 available' }
-
-        if int(config['enabled']) != 1:
-            return {'status': 'fail', 'message': 'Service is not enabled' }
 
         self.__aws_key_id = config['providerkey']
         self.__aws_key_secret = config['providersecret']
@@ -191,7 +210,13 @@ class StorageInterfaceAws(StorageInterface):
                 headers['x-amz-meta-{}'.format(tag_key)] = tag_value
 
         try:
-            r = requests.put(url, data=content, headers=headers, auth=S3Auth(self.__aws_key_id, self.__aws_key_secret), timeout=self.aws_request_timeout)
+            r = requests.put(
+                url,
+                data=content,
+                headers=headers,
+                auth=S3Auth(self.__aws_key_id, self.__aws_key_secret),
+                timeout=self.aws_request_timeout
+            )
         except(Exception) as e:
             return {
                 'status': 'fail',
@@ -219,7 +244,7 @@ class StorageInterfaceAws(StorageInterface):
             'data': url
         }
 
-    def list_objects(self, bucket, path, continuation_token=None, max_keys=1000):
+    def list_objects(self, bucket, path, continuation_token=None, max_keys=1000, inject_local_metadata=False):
 
         params = {'list-type': 2, 'max-keys': max_keys, 'prefix': path}
         if continuation_token is not None:
@@ -228,7 +253,11 @@ class StorageInterfaceAws(StorageInterface):
         url = 'https://{}.s3.amazonaws.com/?{}'.format(bucket, urllib.urlencode(params))
 
         try:
-            r = requests.get(url, auth=S3Auth(self.__aws_key_id, self.__aws_key_secret), timeout=self.aws_request_timeout)
+            r = requests.get(
+                url,
+                auth=S3Auth(self.__aws_key_id, self.__aws_key_secret),
+                timeout=self.aws_request_timeout,
+            )
         except(Exception) as e:
             return {
                 'status': 'fail',
@@ -260,6 +289,15 @@ class StorageInterfaceAws(StorageInterface):
                     data['ListBucketResult']['Contents'] = [data['ListBucketResult']['Contents']]
                 for item in data['ListBucketResult']['Contents']:
                     item['ETag'] = item['ETag'].strip('"')
+                    item['LastModified'] = self.normalize_timestamp(item['LastModified'])
+                    if inject_local_metadata is True:
+                        filename = os.path.basename(item['Key'])
+                        if 'config-' in filename:
+                            timestamp = filename.lower().replace('config-','').replace('.xml','')
+                            item['MetaData'] = {
+                                'Created': self.normalize_timestamp(timestamp)
+                            }
+                        #item['MetaData'] = self.get_local_metadata(item['ETag'])
                     contents[os.path.basename(item['Key'])] = item
 
             if 'ListBucketResult' in data and 'NextContinuationToken' in data['ListBucketResult']:
@@ -278,6 +316,15 @@ class StorageInterfaceAws(StorageInterface):
             'status': 'fail',
             'message': 'Response data is not XML format as expected',
             'data': r.content
+        }
+
+    def get_local_metadata(self, etag):
+        return {
+            'filetype': None,
+            'mtime': None,
+            'bytes': None,
+            'md5': None,
+            'hostid': None,
         }
 
 

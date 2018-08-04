@@ -22,18 +22,5 @@ class ServiceController extends ApiControllerBase
         
         return $response;
     }
-    
-    public function syncAction()
-    {
-        $response = array("status"=>"fail", "message" => "Invalid request");
-
-        if ($this->request->isPost()) {
-            $backend = new Backend();
-            $configd_run = "configsync aws_sync_config_current";
-            $response = json_decode(trim($backend->configdRun($configd_run)), true);
-        }
-        
-        return $response;
-    }
 
 }
