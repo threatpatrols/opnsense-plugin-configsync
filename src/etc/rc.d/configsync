@@ -19,8 +19,8 @@ configsync_enable=${configsync_enable:-"NO"}
 configsync_configfile=${configsync_configfile:-"/usr/local/etc/configsync/configsync.conf"}
 
 configsync_flags="-c ${configsync_configfile}"
-command=/usr/local/sbin/configsync-monitord
-pidfile=/var/run/configsync-monitord.pid
+command=/usr/local/opnsense/scripts/VerbNetworks/ConfigSync/MonitorDaemon.py
+pidfile=/var/run/configsync-monitordaemon.pid
 
 start_cmd="configsync_start_cmd"
 stop_cmd="configsync_stop_cmd"

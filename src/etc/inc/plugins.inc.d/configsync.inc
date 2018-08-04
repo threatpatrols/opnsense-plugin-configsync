@@ -22,7 +22,7 @@ function configsync_services()
             'stop' => array('configsync stop'),
         ),
         'name' => 'configsync',
-        'pidfile' => '/var/run/configsync-monitord.pid'
+        'pidfile' => '/var/run/configsync-monitordaemon.pid'
     );
 
     return $services;
@@ -33,7 +33,7 @@ function configsync_syslog()
     $logfacilities = array();
 
     $logfacilities['configsync'] = array(
-        'facility' => array('configsync', 'configsync-monitord'),
+        'facility' => array('configsync', 'configsync-monitordaemon', 'MonitorDaemon.py'),
     );
 
     return $logfacilities;

@@ -40,6 +40,12 @@
         <b>NOTE:</b> the Configuration Sync feature <u>will</u> create the required storage-path if API key has permissions to do so.  It is recommended that you consider applying policy to the API Key that restricts access within the bucket to this storage-path only.]]></help>
     </field>
     <field>
+        <id>configsync.settings.Interval</id>
+        <label>Monitor Interval</label>
+        <type>text</type>
+        <help><![CDATA[The time interval in seconds between successive checks for configuration file changes that require syncing to the storage-provider.  The default setting is 10 seconds.]]></help>
+    </field>
+    <field>
         <id>configsync.settings.SystemHostid</id>
         <label>System Host Id</label>
         <type>info</type>

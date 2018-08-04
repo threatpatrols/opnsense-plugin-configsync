@@ -45,6 +45,14 @@
                 <ValidationMessage>Must provide a valid storage-path value</ValidationMessage>
             </StoragePath>
 
+            <Interval type="IntegerField">
+                <default>10</default>
+                <MinimumValue>3</MinimumValue>
+                <MaximumValue>999999</MaximumValue>
+                <Required>Y</Required>
+                <ValidationMessage>Must provide an integer value between 3 and 999999</ValidationMessage>
+            </Interval>
+
             <SystemHostid type="TextField">
                 <default>[system-hostid]</default>
                 <Required>N</Required>

@@ -46,7 +46,6 @@ reload_config()
 
 deploy_service()
 {
-    rsync -a --no-o --no-g "${local_opnsense_path}/../bin/configsync-monitord" "${remote}:/usr/local/sbin/configsync-monitord"
     rsync -a --no-o --no-g "${local_opnsense_path}/../etc/rc.d/configsync" "${remote}:/usr/local/etc/rc.d/configsync"
     rsync -a --no-o --no-g "${local_opnsense_path}/../etc/inc/plugins.inc.d/configsync.inc" "${remote}:/usr/local/etc/inc/plugins.inc.d/configsync.inc"
 }
