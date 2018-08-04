@@ -51,6 +51,12 @@ deploy_service()
     rsync -a --no-o --no-g "${local_opnsense_path}/../etc/inc/plugins.inc.d/configsync.inc" "${remote}:/usr/local/etc/inc/plugins.inc.d/configsync.inc"
 }
 
+deploy_www()
+{
+    rsync -a --no-o --no-g "${local_opnsense_path}/../www/diag_logs_configsync.php" "${remote}:/usr/local/www/diag_logs_configsync.php"
+}
+
+
 cd ${local_opnsense_path}
 for filename_find in $(find . -type f -not -name *.pyc); do
     filename=$(echo $filename_find | sed 's/^..//')
@@ -63,4 +69,8 @@ done
 
 configure_plugins
 reload_config
-deploy_service
+
+if [ $action != "remove" ]; then
+    deploy_service
+    deploy_www
+fi

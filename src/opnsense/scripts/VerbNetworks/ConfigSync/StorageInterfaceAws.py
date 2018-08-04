@@ -85,6 +85,7 @@ class StorageInterfaceAws(StorageInterface):
             content_encoding=None if self.storage_use_gzip_encoding is not True else 'gzip',
             content_type='application/xml',
             object_tags={
+                'filetype': 'opnsense-config',
                 'mtime': str(meta['mtime']),
                 'bytes': str(meta['bytes']),
                 'md5': str(meta['md5']),
@@ -156,6 +157,7 @@ class StorageInterfaceAws(StorageInterface):
                 content_encoding=None if self.storage_use_gzip_encoding is not True else 'gzip',
                 content_type='application/xml',
                 object_tags={
+                    'filetype': 'opnsense-config',
                     'mtime': str(meta['mtime']),
                     'bytes': str(meta['bytes']),
                     'md5': str(meta['md5']),

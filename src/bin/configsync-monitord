@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import json
+import syslog
 import argparse
 import subprocess
 import ConfigParser
@@ -31,6 +32,7 @@ class ConfigSyncMonitord(object):
     monitors = None
     interval = None
     debug = None
+    daemonized = None
 
     def __init__(self):
         pass
@@ -38,29 +40,38 @@ class ConfigSyncMonitord(object):
     def main(self):
 
         parser = argparse.ArgumentParser(description='configsync-monitord')
-        parser.add_argument('--config', '-c', type=str, metavar='<config-file>', required=True, help='Configuration file to use and load')
-        parser.add_argument('--foreground', '-F', action='store_true', help='Prevent running as a daemon, keeps process in foreground')
-        parser.add_argument('--pid', '-p', type=str, metavar='<pidfile>', default=CONFIGSYNCMONITORD_PIDFILE, help='PID file location other than {} default'.format(CONFIGSYNCMONITORD_PIDFILE))
-        parser.add_argument('--debug', '-d', action='store_true', help='Enable debug logging output')
+        parser.add_argument('--config', '-c', type=str, metavar='<config-file>', required=True,
+                            help='Configuration file to use and load')
+        parser.add_argument('--foreground', '-F', action='store_true',
+                            help='Prevent running as a daemon, keeps process in foreground')
+        parser.add_argument('--pid', '-p', type=str, metavar='<pidfile>', default=CONFIGSYNCMONITORD_PIDFILE,
+                            help='PID file location other than {} default'.format(CONFIGSYNCMONITORD_PIDFILE))
+        parser.add_argument('--debug', '-d', action='store_true',
+                            help='Enable debug logging output')
         args = parser.parse_args()
 
         return_code = 0
         if args.foreground is False:
+            self.daemonized = True
             return_code = self.daemonize()
             if args.pid is not None:
                 with open(args.pid, 'w') as f:
                     f.write(str(os.getpid()))
+        else:
+            self.daemonized = False
 
         self.log('info', 'configsync-monitord start')
 
         self.config_file = args.config
         self.reload_config()
-
         self.debug = args.debug
+
+        while os.path.isfile('/var/run/booting') is True:
+            time.sleep(5)
 
         if self.enabled is not True:
             self.log('info', 'Service is not enabled, exiting')
-            return None
+            sys.exit(return_code)
 
         if os.uname()[0].lower() == 'freebsd':
             self.log('debug', 'Confirmed running on a FreeBSD based system')
@@ -87,17 +98,17 @@ class ConfigSyncMonitord(object):
                 self.reload_config()
 
             if self.enabled is not True:
-                self.log('info', 'Service has been disabled, exiting now')
+                self.log('info', 'Service has been disabled')
                 break
 
             for index, monitor in enumerate(self.monitors):
                 checksum = self.command_shell('{} {} | sort | {} | cut -d" " -f1'.format(md5bin, monitor['pattern'], md5bin))
                 if checksum != monitor_checksums[index]:
-                    self.log('info', 'Change detected on pattern {}'.format(monitor['pattern']))
+                    self.log('info', 'Change detected on monitoring pattern {}'.format(monitor['pattern']))
                     try:
                         response = self.command_shell(self.monitors[index]['action'])
                         response_unpacked = json.loads(response)
-                        self.log('debug', 'Action success on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
+                        self.log('info', 'Action success on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
                     except ValueError:
                         self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=response)
                     except ConfigSyncMonitordException as e:
@@ -113,6 +124,8 @@ class ConfigSyncMonitord(object):
 
             self.log('debug', 'Sleeping {} seconds'.format(self.interval))
             time.sleep(self.interval)
+
+        self.log('info', 'Service has terminated')
         sys.exit(return_code)
 
     def command_shell(self, command):
@@ -174,17 +187,30 @@ class ConfigSyncMonitord(object):
             'message': message,
             'timestamp': time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
         }
+        syslog_message = message
 
         if data is not None:
             log_event['data'] = data
+            if type(data) is dict and 'data' in data:
+                syslog_message += ' {}'.format(json.dumps(data['data']))
+            else:
+                syslog_message += ' {}'.format(json.dumps(data))
 
         if level == 'debug':
             if self.debug is True:
-                sys.stderr.write(json.dumps(log_event) + '\n')
+                if self.daemonized is True:
+                    # this is a bit crap  :(
+                    syslog.syslog(syslog.LOG_ALERT, syslog_message)
+                else:
+                    sys.stderr.write(json.dumps(log_event) + '\n')
+                    sys.stderr.flush()
         else:
-            sys.stderr.write(json.dumps(log_event) + '\n')
+            if self.daemonized is True:
+                syslog.syslog(syslog.LOG_ALERT, syslog_message)
+            else:
+                sys.stderr.write(json.dumps(log_event) + '\n')
+                sys.stderr.flush()
 
-        sys.stderr.flush()
         return log_event
 
     def daemonize(self):

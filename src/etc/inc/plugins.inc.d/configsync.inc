@@ -27,3 +27,14 @@ function configsync_services()
 
     return $services;
 }
+
+function configsync_syslog()
+{
+    $logfacilities = array();
+
+    $logfacilities['configsync'] = array(
+        'facility' => array('configsync', 'configsync-monitord'),
+    );
+
+    return $logfacilities;
+}
