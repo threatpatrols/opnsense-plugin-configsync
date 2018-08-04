@@ -102,7 +102,10 @@ class MonitorDaemon(object):
                         try:
                             response = self.command_shell(self.monitors[index]['action'])
                             response_unpacked = json.loads(response)
-                            self.log('info', 'Action success on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
+                            if response_unpacked['status'] == 'success':
+                                self.log('info', 'Action success on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
+                            else:
+                                self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
                         except ValueError:
                             self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=response)
                         except MonitorDaemonException as e:
@@ -200,8 +203,9 @@ class MonitorDaemon(object):
             else:
                 syslog_message += ' {}'.format(json.dumps(data))
 
+        # this all feels a bit crap  :(
+
         if level == 'debug':
-            # this is a bit crap  :(
             if self.debug is True:
                 if self.foreground is True:
                     sys.stderr.write(json.dumps(log_event) + '\n')

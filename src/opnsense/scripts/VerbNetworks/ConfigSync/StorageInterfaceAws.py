@@ -1,9 +1,9 @@
 #!/usr/local/bin/python2.7
 
 import os
+import urllib
 import argparse
 import requests
-import urllib
 
 from requestsaws.awsauth import S3Auth
 from StorageInterface import StorageInterface
@@ -15,12 +15,12 @@ class StorageInterfaceAwsException(Exception):
 
 class StorageInterfaceAws(StorageInterface):
 
-    __aws_key_id = None
-    __aws_key_secret = None
-
     storage_configs_full_path='{storage_path}/{hostname}'
     storage_use_gzip_encoding=True
-    aws_request_timeout = 15
+    aws_request_timeout = 30
+
+    __aws_key_id = None
+    __aws_key_secret = None
 
     def main(self):
 
@@ -124,7 +124,10 @@ class StorageInterfaceAws(StorageInterface):
                 storage_path=config['storagepath'],
                 hostname=self.get_system_hostname()
             )
-            existing_configs = self.list_objects(config['storagebucket'], prefix_path)['data']
+            list_response = self.list_objects(config['storagebucket'], prefix_path)
+            if list_response['status'] != 'success':
+                return list_response
+            existing_configs = list_response['data']
 
         target_paths = []
         for config_item in config_list:
@@ -150,7 +153,7 @@ class StorageInterfaceAws(StorageInterface):
 
             target_paths.append(target_path)
 
-            response = self.put_object(
+            put_response = self.put_object(
                 bucket=config['storagebucket'],
                 path=target_path,
                 content=content if self.storage_use_gzip_encoding is not True else self.gzip_content(content),
@@ -165,8 +168,8 @@ class StorageInterfaceAws(StorageInterface):
                 }
             )
 
-            if response['status'] != 'success':
-                return response
+            if put_response['status'] != 'success':
+                return put_response
 
         return {'status': 'success', 'message': 'Successfully PUT all AWS S3 objects', 'data': target_paths}
 
