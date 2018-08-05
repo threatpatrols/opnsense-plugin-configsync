@@ -1,5 +1,11 @@
 #!/usr/local/bin/python2.7
 
+# Copyright (c) 2018 Verb Networks Pty Ltd <contact [at] verbnetworks.com>
+#  - All rights reserved.
+#
+# Apache License v2.0
+#  - http://www.apache.org/licenses/LICENSE-2.0
+
 import os
 import urllib
 import argparse

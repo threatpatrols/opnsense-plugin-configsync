@@ -84,7 +84,7 @@
                 <p>Apache 2 Licensed. See LICENSE file for full details.</p>
 
                 <h1>Copyright</h1>
-                <p>Copyright 2018 <a href="https://verbnetworks.com/">Verb Networks Pty Ltd</a></p>
+                <p>Copyright 2018 - All rights reserved - <a href="https://verbnetworks.com/">Verb Networks Pty Ltd</a></p>
                 
             </div>
 
