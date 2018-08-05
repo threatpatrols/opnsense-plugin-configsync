@@ -17,6 +17,7 @@ class StorageInterfaceAws(StorageInterface):
 
     storage_configs_full_path='{storage_path}/{hostname}'
     storage_use_gzip_encoding=True
+    storage_list_objects_cache='/var/db/configsync/list_objects'
     aws_request_timeout = 60    # NB: list_objects can take a long time when there are a large number of items to page through
 
     __aws_key_id = None
@@ -27,7 +28,7 @@ class StorageInterfaceAws(StorageInterface):
         parser = argparse.ArgumentParser(description='AWS S3 storage interface for ConfigSync')
         parser.add_argument('action',
             type=str,
-            choices=['test_parameters', 'sync_config_current', 'sync_config_missing', 'get_file_list', 'update_meta_file_list'],
+            choices=['test_parameters', 'sync_config_current', 'sync_config_missing', 'get_file_list'],
             help='Interface action requested'
         )
         parser.add_argument('--key_id', type=str, help='AWS key id')
@@ -51,24 +52,20 @@ class StorageInterfaceAws(StorageInterface):
             return self.sync_config_missing()
         elif args.action == 'get_file_list':
             return self.get_file_list()
-        elif args.action == 'update_meta_file_list':
-            return self.update_meta_file_list()
 
         return {'status': 'fail', 'message': 'Unable to invoke StorageInterfaceAws of ConfigSync'}
 
     def get_file_list(self):
         config = self.read_config('awss3')
-
         if config is None:
             return {'status': 'fail', 'message': 'No configuration for awss3 available' }
-
         self.__aws_key_id = config['providerkey']
         self.__aws_key_secret = config['providersecret']
-
-        return self.list_objects(bucket=config['storagebucket'], path=config['storagepath'], inject_local_metadata=True)
-
-    def update_meta_file_list(self):
-        pass
+        prefix_path = self.storage_configs_full_path.format(
+            storage_path=config['storagepath'],
+            hostname=self.get_system_hostname()
+        )
+        return self.list_objects(bucket=config['storagebucket'], path=prefix_path, use_cached=True)
 
     def test_parameters(self, key_id, key_secret, bucket, path):
 
@@ -137,13 +134,14 @@ class StorageInterfaceAws(StorageInterface):
         self.__aws_key_id = config['providerkey']
         self.__aws_key_secret = config['providersecret']
 
+        prefix_path = self.storage_configs_full_path.format(
+            storage_path=config['storagepath'],
+            hostname=self.get_system_hostname()
+        )
+
         existing_configs = {}
         if overwrite_existing is False:
-            prefix_path = self.storage_configs_full_path.format(
-                storage_path=config['storagepath'],
-                hostname=self.get_system_hostname()
-            )
-            list_response = self.list_objects(config['storagebucket'], prefix_path)
+            list_response = self.list_objects(bucket=config['storagebucket'], path=prefix_path, use_cached=True)
             if list_response['status'] != 'success':
                 return list_response
             existing_configs = list_response['data']
@@ -189,6 +187,10 @@ class StorageInterfaceAws(StorageInterface):
 
             if put_response['status'] != 'success':
                 return put_response
+
+        if overwrite_existing is False:
+            # update the list_objects cache
+            self.list_objects(bucket=config['storagebucket'], path=prefix_path, use_cached=False)
 
         return {'status': 'success', 'message': 'Successfully PUT all AWS S3 objects', 'data': target_paths}
 
@@ -244,13 +246,22 @@ class StorageInterfaceAws(StorageInterface):
             'data': url
         }
 
-    def list_objects(self, bucket, path, continuation_token=None, max_keys=1000, inject_local_metadata=False):
+    def list_objects(self, bucket, path, continuation_token=None, max_keys=1000, use_cached=False):
 
         params = {'list-type': 2, 'max-keys': max_keys, 'prefix': path}
         if continuation_token is not None:
             params['continuation-token'] = continuation_token
 
         url = 'https://{}.s3.amazonaws.com/?{}'.format(bucket, urllib.urlencode(params))
+
+        if use_cached is True:
+            cached = self.get_cache(path=self.storage_list_objects_cache, keydata=[url])
+            if cached is not None:
+                return {
+                    'status': 'success',
+                    'message': 'Successful AWS S3 object list loaded from cache',
+                    'data': cached
+                }
 
         try:
             r = requests.get(
@@ -290,15 +301,16 @@ class StorageInterfaceAws(StorageInterface):
                 for item in data['ListBucketResult']['Contents']:
                     item['ETag'] = item['ETag'].strip('"')
                     item['LastModified'] = self.normalize_timestamp(item['LastModified'])
-                    if inject_local_metadata is True:
-                        filename = os.path.basename(item['Key'])
-                        if 'config-' in filename:
-                            timestamp = filename.lower().replace('config-','').replace('.xml','')
-                            item['MetaData'] = {
-                                'Created': self.normalize_timestamp(timestamp)
-                            }
-                        #item['MetaData'] = self.get_local_metadata(item['ETag'])
-                    contents[os.path.basename(item['Key'])] = item
+
+                    # a messy yet simple hack indeed
+                    filename = os.path.basename(item['Key'])
+                    if filename.startswith('config-') and filename.endswith('.xml'):
+                        timestamp = filename.lower().replace('config-','').replace('.xml','')
+                        item['Created'] = self.normalize_timestamp(timestamp)
+                    else:
+                        item['Created'] = filename
+
+                    contents[filename] = item
 
             if 'ListBucketResult' in data and 'NextContinuationToken' in data['ListBucketResult']:
                 next_token = data['ListBucketResult']['NextContinuationToken']
@@ -307,6 +319,7 @@ class StorageInterfaceAws(StorageInterface):
                     return {'status': 'fail', 'message': next_data['message'], 'data': next_data['data']}
                 contents.update(next_data['data'])
 
+            self.set_cache(data=contents, path=self.storage_list_objects_cache, keydata=[url])
             return {
                 'status': 'success',
                 'message': 'Successful AWS S3 object list GET',

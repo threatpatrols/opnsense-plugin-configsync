@@ -72,15 +72,8 @@ class MonitorDaemon(object):
             return None
 
         monitor_checksums = []
-
-        self.log('debug', 'Determining initial checksums for each pattern before entering the monitor loop')
-        for index, monitor in enumerate(self.monitors):
-            checksum = self.get_pattern_checksum(monitor['pattern'])
-            self.log('debug', 'Initial checksum for pattern {} is {}'.format(monitor['pattern'], checksum))
-            if index not in monitor_checksums:
-                monitor_checksums.append(checksum)
-            else:
-                monitor_checksums[index] = checksum
+        for __devnull in enumerate(self.monitors):
+            monitor_checksums.append('none')
 
         self.log('debug', 'Entering monitor loop for detecting change based on recursive md5sum patterns')
         while True:
@@ -97,19 +90,18 @@ class MonitorDaemon(object):
 
                     checksum = self.get_pattern_checksum(monitor['pattern'])
                     if checksum != monitor_checksums[index]:
-                        self.log('info', 'Change detected on monitoring pattern {}'.format(monitor['pattern']))
-
+                        self.log('info', 'Calling action: ', data=self.monitors[index]['action'])
                         try:
                             response = self.command_shell(self.monitors[index]['action'])
                             response_unpacked = json.loads(response)
                             if response_unpacked['status'] == 'success':
-                                self.log('info', 'Action success on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
+                                self.log('info', 'Action success: ', data=response_unpacked)
                             else:
-                                self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=response_unpacked)
+                                self.log('error', 'Action failed: ', data=response_unpacked)
                         except ValueError:
-                            self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=response)
+                            self.log('error', 'Action failed: ', data=response)
                         except MonitorDaemonException as e:
-                            self.log('error', 'Action failed on change for pattern {}'.format(monitor['pattern']), data=str(e))
+                            self.log('error', 'Action failed: ', data=str(e))
 
                     monitor_checksums[index] = checksum
 
@@ -147,7 +139,7 @@ class MonitorDaemon(object):
         return stdout.strip()
 
     def load_configsync_config(self):
-        self.log('info', 'load_configsync_config', data=self.config_file)
+        self.log('info', 'Loading monitordaemon configuration: ', data=self.config_file)
 
         if not os.path.isfile(self.config_file):
             raise MonitorDaemonException('Unable to find configuration file', self.config_file)

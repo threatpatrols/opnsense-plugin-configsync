@@ -22,18 +22,4 @@ class FilesController extends ApiControllerBase
         return $response;
     }
     
-    public function updatemetaAction()
-    {
-        $response = array("status"=>"fail", "message" => "Invalid request");
-
-        if ($this->request->isGet()) {
-            $backend = new Backend();
-            $response = json_decode(trim($backend->configdRun(
-                    "configsync awss3_update_meta_file_list"
-            )), true);
-        }
-        
-        return $response;
-    }
-
 }

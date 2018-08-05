@@ -214,3 +214,24 @@ class StorageInterface(object):
         #return time.strftime('%Y-%m-%d %H:%M:%S', t)
         #return time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.mktime(t)))
         return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timegm(t)))
+
+    def get_cache(self, path, keydata):
+        if not os.path.isdir(os.path.dirname(path)):
+            return None
+        fullpath = path + '.' + self.gen_cache_key(keydata)
+        if not os.path.isfile(fullpath):
+            return None
+        with open(fullpath, 'rb') as f:
+            data = json.load(f)
+        return data
+
+    def set_cache(self, data, path, keydata):
+        if not os.path.isdir(os.path.dirname(path)):
+            return False
+        fullpath = path + '.' + self.gen_cache_key(keydata)
+        with open(fullpath, 'wb') as f:
+            json.dump(data, f)
+        return True
+
+    def gen_cache_key(self, keydata):
+        return self.content_digest(json.dumps(keydata))

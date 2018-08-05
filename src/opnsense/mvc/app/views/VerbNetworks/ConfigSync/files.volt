@@ -41,10 +41,9 @@
                 $("#responseMsg").addClass('hidden').html("");
                 $('#filelist > tbody').empty();
                 $.each(data['data'], function(filename, filedata) {
-                    created = filedata['MetaData']['Created'] === undefined ? 'unknown' : filedata['MetaData']['Created'];
                     $('#filelist > tbody').append(
                         '<tr>' +
-                        '<td>' + created + '</td>' +
+                        '<td>' + filedata['Created'] + '</td>' +
                         '<td>' + filedata['LastModified'] + '</td>' +
                         '<td>' + filedata['Key'] + '</td>' +
                         '</tr>'
@@ -55,7 +54,11 @@
         });
     }
 
-    $( document ).ready(function() {
+    /**
+     * $(document).ready
+     */
+    $(document).ready(function() {
+        updateServiceControlUI('configsync');
         updateFileTable(true);
     });
     

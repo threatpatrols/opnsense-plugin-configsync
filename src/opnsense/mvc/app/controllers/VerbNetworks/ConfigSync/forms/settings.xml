@@ -17,7 +17,7 @@
         <label>API Key</label>
         <type>text</type>
         <help><![CDATA[Storage provider API key.<br/>
-        <b>NOTE:</b> Consider applying a storage-provider policy to this key that only permits <code>ListBucket</code>, <code>PutObject</code>, <code>GetObject</code> operations within the storage-bucket and storage-path.]]></help>
+        <b>NOTE:</b> Consider applying a storage-provider policy to this key that only permits <code>ListBucket</code> and <code>PutObject</code> operations within the storage-bucket and storage-path.]]></help>
     </field>
     <field>
         <id>configsync.settings.ProviderSecret</id>
