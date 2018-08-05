@@ -23,9 +23,14 @@ command=/usr/local/opnsense/scripts/VerbNetworks/ConfigSync/MonitorDaemon.py
 pidfile=/var/run/configsync-monitordaemon.pid
 
 start_cmd="configsync_start_cmd"
+start_precmd="configsync_prestart_cmd"
 stop_cmd="configsync_stop_cmd"
 restart_cmd="configsync_restart_cmd"
 status_cmd="configsync_status_cmd"
+
+configsync_prestart_cmd() {
+    mkdir -p /var/db/configsync
+}
 
 configsync_start_cmd() {
     if [ ! -e ${pidfile} ]; then
