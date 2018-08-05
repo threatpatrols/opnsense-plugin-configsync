@@ -30,7 +30,7 @@
      */
     function updateFileTable() {
         
-        $("#responseMsg").removeClass("hidden").removeClass("alert-danger").addClass('alert-info').html("Retreiving list of configuration files at the storage-provider...");
+        $("#responseMsg").removeClass("hidden").removeClass("alert-danger").addClass('alert-info').html("Retreiving list of configuration files available at the storage-provider...");
         
         ajaxGet('/api/configsync/files/get', {}, function (data, status) {
             if(status == 'parsererror' || data['status'] != 'success') {
