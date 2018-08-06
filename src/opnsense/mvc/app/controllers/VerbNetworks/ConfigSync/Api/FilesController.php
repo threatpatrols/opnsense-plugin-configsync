@@ -41,12 +41,9 @@ class FilesController extends ApiControllerBase
 
         if ($this->request->isGet()) {
             $backend = new Backend();
-            $response = json_decode(trim($backend->configdRun(
-                    "configsync awss3_get_file_list"
-            )), true);
+            $response = json_decode(trim($backend->configdRun("configsync awss3_get_file_list")), true);
         }
         
         return $response;
     }
-    
 }

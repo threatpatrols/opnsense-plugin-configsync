@@ -57,7 +57,7 @@ class ServiceController extends ApiControllerBase
         if ($this->request->isPost()) {
             $backend = new Backend();
             $backend_result = trim($backend->configdRun('configsync status'));
-            if (FALSE === strpos(strtolower($backend_result),' not running')) {
+            if (false === strpos(strtolower($backend_result), ' not running')) {
                 $response = array("status"=>"running");
             } else {
                 $response = array("status"=>"stopped");
@@ -111,5 +111,4 @@ class ServiceController extends ApiControllerBase
         
         return $response;
     }
-
 }

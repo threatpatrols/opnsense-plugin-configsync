@@ -54,19 +54,16 @@ class SettingsController extends ApiControllerBase
         $response = array("status"=>"fail", "message" => "Invalid request");
         
         if ($this->request->isPost()) {
-            
             $model_ConfigSync = new ConfigSync();
             $model_ConfigSync->setNodes($this->request->getPost("configsync"));
             $response["validations"] = ControllerUtils::unpackValidationMessages($model_ConfigSync, 'configsync');
             
             if (0 == count($response["validations"])) {
-                
                 $model_ConfigSync->serializeToConfig();
                 Config::getInstance()->save();
                 $response["status"] = "success";
                 $response["message"] = "Configuration saved.";
                 unset($response["validations"]);
-                
             }
         }
         return $response;
@@ -77,34 +74,30 @@ class SettingsController extends ApiControllerBase
         $response = array("status"=>"fail", "message" => "Invalid request");
         
         if ($this->request->isPost()) {
-            
             $model_ConfigSync = new ConfigSync();
             $model_ConfigSync->setNodes($this->request->getPost("configsync"));
             $response["validations"] = ControllerUtils::unpackValidationMessages($model_ConfigSync, 'configsync');
             
             if (0 == count($response["validations"])) {
-
                 $data = $this->request->getPost("configsync");
                 $backend = new Backend();
                 
-                if('awss3' == $data['settings']['Provider']) {
+                if ('awss3' == $data['settings']['Provider']) {
                     $configd_run = sprintf(
-                            'configsync awss3_test_parameters --key_id="%s" --key_secret="%s" --bucket="%s" --path="%s"', 
-                            $data['settings']['ProviderKey'],
-                            $data['settings']['ProviderSecret'],
-                            $data['settings']['StorageBucket'],
-                            $data['settings']['StoragePath']
-                            );
+                        'configsync awss3_test_parameters --key_id="%s" --key_secret="%s" --bucket="%s" --path="%s"',
+                        $data['settings']['ProviderKey'],
+                        $data['settings']['ProviderSecret'],
+                        $data['settings']['StorageBucket'],
+                        $data['settings']['StoragePath']
+                    );
                     $response = json_decode(trim($backend->configdRun($configd_run)), true);
-                    if(empty($response)) {
+                    if (empty($response)) {
                         $response["message"] = "Error calling configsync awss3_test_parameters via configd";
                     }
-                }
-                else {
+                } else {
                     $response["message"] = "Provider not supported";
                 }
-            }
-            else {
+            } else {
                 $response["message"] = "Invalid configuration data provided for testing";
             }
         }
@@ -119,5 +112,4 @@ class SettingsController extends ApiControllerBase
         
         return $response;
     }
-    
 }
