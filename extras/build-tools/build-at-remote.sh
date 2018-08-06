@@ -42,6 +42,12 @@ rsync \
     ${opnsense_plugins_repo_path}/ \
     ${remote_user}@${remote_host}:${remote_base_path}
 
+## lint
+ssh ${remote_user}@${remote_host} "cd ${remote_base_path}/${configsync_opnsense_plugins_subpath}; make lint"
+
+## style
+ssh ${remote_user}@${remote_host} "cd ${remote_base_path}/${configsync_opnsense_plugins_subpath}; make style"
+
 ## do the build
 ssh ${remote_user}@${remote_host} "cd ${remote_base_path}/${configsync_opnsense_plugins_subpath}; make clean; make package"
 
