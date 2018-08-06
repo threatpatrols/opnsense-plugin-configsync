@@ -13,7 +13,7 @@ within cloud-compute providers.
 ****
 
 ## Authors
-Plugin managed by [Verb Networks](https://github.com/verbnetworks)
+Plugin managed by [Verb Networks Pty Ltd](https://verbnetworks.com)
 
 ## License
-Apache 2 Licensed. See LICENSE for full details.
+BSD-2-Clause - see LICENSE file for full details.
