@@ -28,7 +28,7 @@ echo ""
 # copy into place the material to be injected into the repo
 rm -Rf ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}
 mkdir ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}
-rsync -ra ${configsync_plugin_repo_path}/src/ ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}/src/
+rsync --exclude *.pyc -ra ${configsync_plugin_repo_path}/src/ ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}/src/
 rsync -a ${configsync_plugin_repo_path}/LICENSE ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}/LICENSE
 rsync -a ${configsync_plugin_repo_path}/Makefile ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}/Makefile
 rsync -a ${configsync_plugin_repo_path}/pkg-descr ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}/pkg-descr
