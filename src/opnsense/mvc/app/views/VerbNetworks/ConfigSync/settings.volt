@@ -51,10 +51,10 @@
                 <p>
                     Configuration Sync is a tool designed to one-way synchronize the system 
                     configuration files from the OPNsense host to S3 compatible object data 
-                    storage in close to real time.  While the tool has the effect of being 
-                    a great configuration backup tool the intent is to provide a tool that
-                    stores the OPNsense system configuration in a location that is readily
-                    addressable in DevOps automation scenarios.
+                    storage in close to real time.  While the tool has the side effect of
+                    being a great configuration backup tool the intent is to provide a tool
+                    that stores the OPNsense system configuration in a location that is
+                    readily addressable in DevOps automation scenarios.
                 </p>
                 
                 <p>
@@ -68,7 +68,7 @@
                     The user-interface within the Configuration Sync plugin provides no
                     direct way to access or download the configuration files that
                     have been synced out to the storage-provider.  Use the storage-provider
-                    web-console or other CLI tool to access and download as required.
+                    web-console or other toolchain to access and download as required.
                 </p>
                 
                 <h2>Supported Versions</h2>
