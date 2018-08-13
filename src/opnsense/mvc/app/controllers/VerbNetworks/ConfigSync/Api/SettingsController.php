@@ -91,7 +91,10 @@ class SettingsController extends ApiControllerBase
                     );
                     $response = json_decode(trim($backend->configdRun($configd_run)), true);
                     if (empty($response)) {
-                        $response["message"] = "Error calling configsync awss3_test_parameters via configd";
+                        $response = array(
+                            "status" => "fail",
+                            "message" => "Error calling configsync awss3_test_parameters via configd"
+                        );
                     }
                 } else {
                     $response["message"] = "Provider not supported";
