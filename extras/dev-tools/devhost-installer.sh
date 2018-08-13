@@ -59,12 +59,18 @@ dev_uninstall()
     ssh $remote "rm -Rf /usr/local/opnsense/mvc/app/controllers/VerbNetworks"
     ssh $remote "rm -Rf /usr/local/opnsense/scripts/VerbNetworks"
     ssh $remote "rm -Rf /usr/local/opnsense/service/templates/VerbNetworks"
+    ssh $remote "rm -Rf /usr/local/etc/configsync"
     ssh $remote "rm -Rf /var/db/configsync; rm -Rf /var/cache/configsync;"
+
+    ssh $remote "rm -f /usr/local/opnsense/mvc/app/cache/*"
 
     ssh $remote "rm -f /usr/local/etc/rc.d/configsync"
     ssh $remote "rm -f /usr/local/etc/inc/plugins.inc.d/configsync.inc"
     ssh $remote "rm -f /usr/local/www/diag_logs_configsync.php"
     ssh $remote "rm -f /usr/local/opnsense/service/conf/actions.d/actions_configsync.conf"
+    ssh $remote "rm -f /var/log/configsync.log"
+    ssh $remote "rm -f /usr/local/opnsense/version/configsync"
+
     ssh $remote "/usr/local/etc/rc.configure_plugins"
 }
 

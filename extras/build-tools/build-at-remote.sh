@@ -24,7 +24,6 @@ echo "configsync_plugin_repo_path:          ${configsync_plugin_repo_path}"
 echo "configsync_opnsense_plugins_subpath:  ${configsync_opnsense_plugins_subpath}"
 echo ""
 
-
 # copy into place the material to be injected into the repo
 rm -Rf ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}
 mkdir ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}
@@ -35,7 +34,7 @@ rsync -a ${configsync_plugin_repo_path}/pkg-descr ${opnsense_plugins_repo_path}/
 rsync -a ${configsync_plugin_repo_path}/README.md ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}/README.md
 
 # push the local opnsense_plugins_repo to the remote FreeBSD system
-rsync \
+echo rsync \
     --recursive \
     --copy-links \
     --delete \
@@ -49,7 +48,7 @@ ssh ${remote_user}@${remote_host} "cd ${remote_base_path}/${configsync_opnsense_
 ssh ${remote_user}@${remote_host} "cd ${remote_base_path}/${configsync_opnsense_plugins_subpath}; make style"
 
 ## do the build
-ssh ${remote_user}@${remote_host} "cd ${remote_base_path}/${configsync_opnsense_plugins_subpath}; make clean; make package"
+ssh ${remote_user}@${remote_host} "cd ${remote_base_path}/${configsync_opnsense_plugins_subpath}; make package"
 
 ## pull the .txz packages back
 rsync \
