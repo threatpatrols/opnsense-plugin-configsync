@@ -83,12 +83,13 @@ class SettingsController extends ApiControllerBase
                 
                 if ('awss3' == $data['settings']['Provider']) {
                     $configd_run = sprintf(
-                        'configsync awss3_test_parameters --key_id="%s" --key_secret="%s" --bucket="%s" --path="%s"',
-                        $data['settings']['ProviderKey'],
-                        $data['settings']['ProviderSecret'],
-                        $data['settings']['StorageBucket'],
-                        $data['settings']['StoragePath']
+                        'configsync awss3_test_parameters --key_id=%s --key_secret=%s --bucket=%s --path=%s',
+                        escapeshellarg($data['settings']['ProviderKey']),
+                        escapeshellarg($data['settings']['ProviderSecret']),
+                        escapeshellarg($data['settings']['StorageBucket']),
+                        escapeshellarg($data['settings']['StoragePath'])
                     );
+                    file_put_contents('/tmp/debug', $configd_run);
                     $response = json_decode(trim($backend->configdRun($configd_run)), true);
                     if (empty($response)) {
                         $response = array(
