@@ -47,8 +47,7 @@ dev_install()
     rsync -a --no-o --no-g "${local_opnsense_path}/../www/diag_logs_configsync.php" "${remote}:/usr/local/www/diag_logs_configsync.php"
 
     ssh $remote "configctl template reload VerbNetworks/ConfigSync"
-    ssh $remote "/usr/local/etc/rc.configure_plugins"
-
+    ssh $remote "/usr/local/etc/rc.configure_plugins; service configd restart"
 }
 
 dev_uninstall()
@@ -62,7 +61,7 @@ dev_uninstall()
     ssh $remote "rm -Rf /usr/local/etc/configsync"
     ssh $remote "rm -Rf /var/db/configsync; rm -Rf /var/cache/configsync;"
 
-    ssh $remote "rm -f /usr/local/opnsense/mvc/app/cache/*"
+    ssh $remote "touch /usr/local/opnsense/mvc/app/cache/file; rm -f /usr/local/opnsense/mvc/app/cache/*"
 
     ssh $remote "rm -f /usr/local/etc/rc.d/configsync"
     ssh $remote "rm -f /usr/local/etc/inc/plugins.inc.d/configsync.inc"
@@ -71,7 +70,7 @@ dev_uninstall()
     ssh $remote "rm -f /var/log/configsync.log"
     ssh $remote "rm -f /usr/local/opnsense/version/configsync"
 
-    ssh $remote "/usr/local/etc/rc.configure_plugins"
+    ssh $remote "/usr/local/etc/rc.configure_plugins; service configd restart"
 }
 
 
