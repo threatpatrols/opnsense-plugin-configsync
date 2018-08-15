@@ -34,9 +34,8 @@ rsync -a ${configsync_plugin_repo_path}/pkg-descr ${opnsense_plugins_repo_path}/
 rsync -a ${configsync_plugin_repo_path}/README.md ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}/README.md
 
 # push the local opnsense_plugins_repo to the remote FreeBSD system
-echo rsync \
+rsync \
     --recursive \
-    --copy-links \
     --delete \
     ${opnsense_plugins_repo_path}/ \
     ${remote_user}@${remote_host}:${remote_base_path}

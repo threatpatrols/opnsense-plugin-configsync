@@ -143,27 +143,29 @@
             link_url += $('#configsync\\.settings\\.StorageBucket').val() + '/';
             link_url += $('#configsync\\.settings\\.StoragePath').val() + '/';
 
-            var link_name = 's3://';
-            link_name += $('#configsync\\.settings\\.StorageBucket').val() + '/';
-            link_name += $('#configsync\\.settings\\.StoragePath').val();
+            var link_text = 's3://';
+            link_text += $('#configsync\\.settings\\.StorageBucket').val() + '/';
+            link_text += $('#configsync\\.settings\\.StoragePath').val();
         }
-        $('#configsync\\.settings\\.StorageProviderLink').html('<a target="_blank" href="' + link_url +'">' + link_name + '</a>');
+        if($('#configsync\\.settings\\.StorageBucket').val().length >= 3 && $('#configsync\\.settings\\.StoragePath').val().length > 0) {
+            $('#configsync\\.settings\\.StorageProviderLink').html(
+                $('<a/>', {
+                    text: link_text,
+                    target: '_blank',
+                    href: link_url,
+                })
+            );
+        } else {
+            $('#configsync\\.settings\\.StorageProviderLink').html("{{ lang._('Please provide') }} <b>Storage Bucket</b> {{ lang._('and') }} <b>Storage Path</b> {{ lang._('values') }}");
+        }
     }
     
-    /**
-     * $(document).ready
-     */
     $(document).ready(function() {
         
         updateServiceControlUI('configsync');
         
-        $("#configsync\\.settings\\.StorageBucket").change(function(){
-            updateFullURI();
-        });
-        
-        $("#configsync\\.settings\\.StoragePath").change(function(){
-            updateFullURI();
-        });
+        $("#configsync\\.settings\\.StorageBucket").change(updateFullURI);
+        $("#configsync\\.settings\\.StoragePath").change(updateFullURI);
         
         mapDataToFormUI({frm_Settings:"/api/configsync/settings/get"}).done(function(data){
             formatTokenizersUI();
@@ -172,35 +174,34 @@
         });
 
         $("#testAction").click(function(){
-            $("#responseMsg").removeClass("hidden").removeClass("alert-danger").addClass('alert-info').html("Running tests...");
+            $("#responseMsg").removeClass("hidden").removeClass("alert-danger").addClass('alert-info').html("{{ lang._('Running tests') }}...");
             saveFormToEndpoint(
-                url='/api/configsync/settings/test', 
-                formid='frm_Settings', 
-                callback_ok=function(data){
-                    if(data['status'] != 'success') {
+                url = '/api/configsync/settings/test', 
+                formid ='frm_Settings', 
+                callback_ok = function(data){
+                    if(data['status'] !== 'success') {
                         $("#responseMsg").removeClass("alert-info").addClass('alert-danger');
                     }
                     $("#responseMsg").html(data['message']);
                 },
-                disable_dialog=true
+                disable_dialog = true
             );
         });
         
         $("#saveAction").click(function(){
-            $("#responseMsg").removeClass("hidden").removeClass("alert-danger").addClass('alert-info').html("Saving settings...");
+            $("#responseMsg").removeClass("hidden").removeClass("alert-danger").addClass('alert-info').html("{{ lang._('Saving settings') }}...");
             saveFormToEndpoint(
-                url='/api/configsync/settings/set', 
-                formid='frm_Settings', 
-                callback_ok=function(){
-                    $("#responseMsg").html("Configuration Sync service settings saved.");
-                    ajaxCall(url="/api/configsync/service/reload", sendData={}, callback=function(data, status) {
-                        $("#responseMsg").html("Configuration Sync service settings saved and reloaded.");
+                url = '/api/configsync/settings/set', 
+                formid = 'frm_Settings', 
+                callback_ok = function(){
+                    $("#responseMsg").html("{{ lang._('Configuration Sync service settings saved') }}.");
+                    ajaxCall(url = "/api/configsync/service/reload", sendData = {}, callback = function(data, status) {
+                        $("#responseMsg").html("{{ lang._('Configuration Sync service settings saved and reloaded') }}.");
                     });
                 },
-                disable_dialog=true 
+                disable_dialog = true 
             );
             updateServiceControlUI('configsync');
         });
-
     });
 </script>
