@@ -6,6 +6,7 @@ remote_host=${1}
 remote_user=root
 
 opnsense_plugins_repo_path=$(realpath $(dirname $(realpath $0))/../../../opnsense-plugins)
+opnsense_plugins_branch='master'
 configsync_plugin_repo_path=$(realpath $(dirname $(realpath $0))/../../)
 configsync_opnsense_plugins_subpath='net-mgmt/configsync'
 remote_base_path='/root/opnsense-plugins'
@@ -20,9 +21,21 @@ echo ""
 echo "remote:                               ${remote_user}@${remote_host}"
 echo "remote_base_path:                     ${remote_base_path}"
 echo "opnsense_plugins_repo_path:           ${opnsense_plugins_repo_path}"
+echo "opnsense_plugins_branch:              ${opnsense_plugins_branch}"
 echo "configsync_plugin_repo_path:          ${configsync_plugin_repo_path}"
 echo "configsync_opnsense_plugins_subpath:  ${configsync_opnsense_plugins_subpath}"
 echo ""
+
+# make sure we are on the correct branch
+current_plugins_branch=$(cd ${opnsense_plugins_repo_path}; git rev-parse --abbrev-ref HEAD)
+if [ ${current_plugins_branch} != ${opnsense_plugins_branch} ]; then
+    echo "OPNsense Plugins is not on the correct branch!"
+    echo " - path: ${opnsense_plugins_repo_path}"
+    echo " - current: ${current_plugins_branch}"
+    echo " - expected: ${opnsense_plugins_branch}"
+    echo ""
+    exit 1
+fi
 
 # copy into place the material to be injected into the repo
 rm -Rf ${opnsense_plugins_repo_path}/${configsync_opnsense_plugins_subpath}
