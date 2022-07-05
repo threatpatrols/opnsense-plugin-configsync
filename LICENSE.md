@@ -9,6 +9,8 @@ https://paritylicense.com/versions/7.0.0
 
 All rights reserved.
 
+---
+
 # The Parity Public License 7.0.0
 
 Contributor: Threat Patrols Pty Ltd
