@@ -135,14 +135,12 @@
 
                 <h1>Copyright</h1>
                 <ul>
-                    <li>Copyright (c) 2022 <a rel="noreferrer noopener" target="_blank" href="https://www.threatpatrols.com">Threat Patrols Pty Ltd</a></li>
-                    <li>Copyright (c) 2018 Nicholas de Jong</li>
-                    <li>Copyright (c) 2018 Verb Networks Pty Ltd</li>
+                    <li><a rel="noreferrer noopener" target="_blank" href="https://github.com/threatpatrols/opnsense-plugin-configsync">Configuration Sync</a> (c) 2022 <a rel="noreferrer noopener" target="_blank" href="https://www.threatpatrols.com">Threat Patrols Pty Ltd</a></li>
                 </ul>
 
                 <h1>License</h1>
-                <p>Distributed under the Parity Public License, Version 7.0.0</p>
-                <p><a href="https://paritylicense.com/versions/7.0.0">https://paritylicense.com/versions/7.0.0</a></p>
+                <p>Distributed under the <a rel="noreferrer noopener" target="_blank" href="https://paritylicense.com/versions/7.0.0">Parity Public License, Version 7.0.0</a></p>
+                <p></p>
 
             </div>
         </div>
