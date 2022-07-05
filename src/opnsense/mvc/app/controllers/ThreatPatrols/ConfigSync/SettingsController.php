@@ -10,19 +10,13 @@
     https://paritylicense.com/versions/7.0.0
 */
 
-function configsync_enabled()
+namespace ThreatPatrols\ConfigSync;
+
+class SettingsController extends \OPNsense\Base\IndexController
 {
-    $model_configsync = new \ThreatPatrols\ConfigSync\ConfigSync();
-    return $model_configsync->settings->enabled->__toString() == "1";
-}
-
-function configsync_syslog()
-{
-    $logfacilities = array();
-
-    $logfacilities['configsync'] = array(
-        'facility' => array('configsync'),
-    );
-
-    return $logfacilities;
+    public function indexAction()
+    {
+        $this->view->pick('ThreatPatrols/ConfigSync/settings');
+        $this->view->settingsForm = $this->getForm("settings");
+    }
 }

@@ -1,0 +1,3 @@
+configsync:/etc/rc.conf.d/configsync
+configsync.conf:/usr/local/etc/configsync/configsync.conf
+syslog-ng-configsync.conf:/usr/local/etc/syslog-ng.conf.d/syslog-ng-configsync.conf

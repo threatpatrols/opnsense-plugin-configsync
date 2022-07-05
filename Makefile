@@ -1,10 +1,14 @@
 PLUGIN_NAME=        configsync
-PLUGIN_VERSION=     0.1
-PLUGIN_REVISION=    5
-PLUGIN_COMMENT=     Sync OPNsense configurations to S3 compatible data storage
-PLUGIN_MAINTAINER=  contact@verbnetworks.com
-PLUGIN_WWW=         https://verbnetworks.com
+PLUGIN_VERSION=     0.4.13
+PLUGIN_COMMENT=     Synchronize system configuration .xml files to various cloud-storage providers
+PLUGIN_MAINTAINER=  contact@threatpatrols.com
+PLUGIN_WWW=         https://github.com/threatpatrols/opnsense-plugin-configsync
+PLUGIN_DEPENDS=
+
+PLUGIN_PREFIX=		os-
+PLUGIN_SUFFIX=
 PLUGIN_DEVEL=       no
-PLUGIN_DEPENDS=     py27-boto3
+
+_VERSION_UPDATE!=   echo "__version__ = \"${PLUGIN_VERSION}\"" > src/opnsense/scripts/ThreatPatrols/ConfigSync/configsync/__version__.py
 
 .include "../../Mk/plugins.mk"

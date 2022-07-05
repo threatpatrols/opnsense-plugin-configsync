@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. /etc/rc.conf.d/configsync
+
+if [ ! -e "${configsync_config}" ]; then
+  exit 0;  # config file does not exist
+fi
+
+if [ ${configsync_enable} != "YES" ]; then
+  exit 0;  # config is not enabled state
+fi
+
+# sync all system config files not yet present on storage-provider (no overwrite)
+configctl configsync sync_all_system_configs
+
+# sync the all system config to the storage-provider (overwrite existing "current" config)
+configctl configsync sync_current_system_config

@@ -1,8 +1,13 @@
-Configuration Sync is a tool designed to one-way synchronize the system 
-configuration files from the OPNsense host to S3 compatible object data storage 
-in close to real time.  While the tool has the effect of being a great 
-configuration backup tool the intent is to provide a tool that stores the 
-OPNsense system configuration in a location that is readily addressable using 
-DevOps automation tools such as Terraform.
+Configuration Sync (configsync) is an OPNsense plugin designed to one-way synchronize the OPNsense system configuration .xml files to an (S3 compatible) cloud-storage provider.
 
-WWW: https://github.com/verbnetworks/opnsense-plugin-configsync
+Support for the following cloud storage providers:
+ * Amazon - S3
+ * Google - Cloud Storage
+ * Digital Ocean - Spaces
+ * Other - S3 compatible endpoints
+
+Configuration Sync works well on OPNsense systems with MultiCLOUDsense in conjunction with DevOps tools like Terraform or Ansible to achieve instance automation to create, destroy and re-create OPNsense instances.
+
+Configuration Sync also happens to be a great OPNsense configuration backup solution when used by itself.
+
+WWW: https://github.com/threatpatrols/opnsense-plugin-configsync

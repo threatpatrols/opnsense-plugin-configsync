@@ -1,0 +1,61 @@
+<model>
+    <mount>//OPNsense/ConfigSync</mount>
+    <description>Threat Patrols "Configuration Sync" application</description>
+    <version>0.1.0</version>
+    <items>
+        <settings>
+
+            <enabled type="BooleanField">
+                <default>0</default>
+                <required>Y</required>
+            </enabled>
+
+            <storage_provider_provider type="OptionField">
+                <required>Y</required>
+                <multiple>N</multiple>
+                <default>aws_s3</default>
+                <optionvalues>
+                    <aws_s3>Amazon Web Services - Simple Storage Service (S3)</aws_s3>
+                    <google_cloud_storage>Google - Cloud Storage (S3 compatible)</google_cloud_storage>
+                    <digitalocean_spaces>Digital Ocean - Spaces (requires: endpoint)</digitalocean_spaces>
+                    <other_s3_compatible>Other S3 compatible (requires: endpoint)</other_s3_compatible>
+                </optionvalues>
+            </storage_provider_provider>
+
+            <storage_provider_endpoint type="UrlField">
+                <required>N</required>
+                <mask>/^[a-z0-9\!\-\_\.\*\'\@\:\$\=\+\;\,\/]{1,1024}$/i</mask>
+                <validationmessage>Provide a valid Storage Provider endpoint URL value</validationmessage>
+            </storage_provider_endpoint>
+
+            <storage_provider_bucket type="TextField">
+                <required>Y</required>
+                <mask>/^[a-z0-9\-\.]{3,64}$/i</mask>
+                <validationmessage>Must provide a valid storage-bucket name</validationmessage>
+            </storage_provider_bucket>
+            
+            <storage_provider_path type="TextField">
+                <required>Y</required>
+                <mask>/^[a-z0-9\!\-\_\.\*\'\@\:\$\=\+\;\,\/]{1,1024}$/i</mask>
+                <validationmessage>Must provide a valid storage-path value</validationmessage>
+            </storage_provider_path>
+
+            <storage_provider_key_id type="TextField">
+                <required>Y</required>
+                <mask>/^[a-z0-9]{8,128}$/i</mask>
+                <validationmessage>Must provide a valid Storage Provider API key value</validationmessage>
+            </storage_provider_key_id>
+
+            <storage_provider_key_secret type="TextField">
+                <required>Y</required>
+                <mask>/^[a-z0-9\+\/]{8,128}$/i</mask>
+                <validationmessage>Must provide a valid Storage Provider API key secret value</validationmessage>
+            </storage_provider_key_secret>
+
+            <system_host_id type="TextField">
+                <required>N</required>
+            </system_host_id>
+
+        </settings>
+    </items>
+</model>
