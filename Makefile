@@ -1,5 +1,5 @@
 PLUGIN_NAME=        configsync
-PLUGIN_VERSION=     0.4.16
+PLUGIN_VERSION=     0.4.17
 PLUGIN_COMMENT=     Synchronize system configuration .xml files to various cloud-storage providers
 PLUGIN_MAINTAINER=  contact@threatpatrols.com
 PLUGIN_WWW=         https://github.com/threatpatrols/opnsense-plugin-configsync

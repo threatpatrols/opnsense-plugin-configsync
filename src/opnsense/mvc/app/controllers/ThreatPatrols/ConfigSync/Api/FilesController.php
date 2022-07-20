@@ -86,8 +86,7 @@ class FilesController extends ApiControllerBase
                     'timestamp_synced' => $properties['LastModified'],
                     'path' => $properties['Key'],
                     'storage_size' => array_key_exists('Size', $properties) ? $properties["Size"] : "Unknown",
-                    'storage_class' => \
-                        array_key_exists('StorageClass', $properties) ? $properties["StorageClass"] : "Unknown",
+                    'storage_class' => array_key_exists('StorageClass', $properties) ? $properties["StorageClass"] : "Unknown",
                     'storage_etag' => array_key_exists('ETag', $properties) ? $properties["ETag"] : "Unknown",
                 ));
             }
