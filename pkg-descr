@@ -1,13 +1,13 @@
-Configuration Sync (configsync) is an OPNsense plugin designed to one-way synchronize the OPNsense system configuration .xml files to an (S3 compatible) cloud-storage provider.
+Configuration Sync (configsync) is an OPNsense plugin designed to one-way synchronize the OPNsense system configuration .xml files to an (S3 compatible) cloud-storage provider.  Actions for configsync are triggered by an OPNsense syshook-config event.
 
 Support for the following cloud storage providers:
- * Amazon - S3
+ * Amazon Web Services - S3
  * Google - Cloud Storage
  * Digital Ocean - Spaces
  * Other - S3 compatible endpoints
 
-Configuration Sync works well on OPNsense systems with MultiCLOUDsense in conjunction with DevOps tools like Terraform or Ansible to achieve instance automation to create, destroy and re-create OPNsense instances.
+Configuration Sync is well-suited to DevOps automation arrangements where OPNsense instances need to be re-invoked with a previously existing configuration.
 
-Configuration Sync also happens to be a great OPNsense configuration backup solution when used by itself.
+Configuration Sync happens to be a great OPNsense configuration backup solution when used by itself.
 
 WWW: https://github.com/threatpatrols/opnsense-plugin-configsync

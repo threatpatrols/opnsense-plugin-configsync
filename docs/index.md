@@ -4,6 +4,12 @@ synchronize the OPNsense system configuration `.xml` files to an (S3
 compatible) cloud-storage provider.  Actions for `configsync` are triggered 
 by an OPNsense syshook-config event.
 
+Configuration Sync is well-suited to DevOps automation arrangements where OPNsense
+instances are re-invoked with a previously existing configuration.
+
+Configuration Sync happens to be a great OPNsense configuration backup solution when 
+used by itself.
+
 ![Configuration Sync Settings](assets/configsync-screenshot01.png){ align=right }
 
 Configuration Sync supports the following cloud storage providers:-
@@ -13,12 +19,9 @@ Configuration Sync supports the following cloud storage providers:-
  * Digital Ocean - Spaces
  * Other - S3 compatible endpoints
 
-Configuration Sync happens to be a great OPNsense configuration backup solution when 
-used by itself.  More usefully the Configuration Sync plugin is used in DevOps automation
-to re-invoke OPNsense instances with a previously existing configuration.
-
 Configuration Sync uses the well known [Python Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) 
-library to achieve generic S3 connectivity.
+library to achieve generic S3 connectivity; if Boto3 can handle the S3 storage provider 
+you should be able to use it here.
 
 ## Installation
 Installation is possible via the Threat Patrols repo.  Refer to the documentation 

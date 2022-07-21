@@ -32,83 +32,45 @@
             <div  class="col-md-12">
                 <h1>Configuration Sync</h1>
                 <p>
-                    Configuration Sync (configsync) is an OPNsense plugin designed to synchronize
-                    the OPNsense system configuration <code>.xml</code> files to an (S3
-                    compatible) cloud-storage provider.  The configsync action is triggered by
-                    OPNsense configuration save events.
+                    Configuration Sync (configsync) is an OPNsense plugin designed to one-way
+                    synchronize the OPNsense system configuration <code>.xml</code>code> files to an (S3
+                    compatible) cloud-storage provider.  Actions for configsync are triggered
+                    by an OPNsense syshook-config event.
+                </p>
+
+                <p>
+                    Configuration Sync is well-suited to DevOps automation arrangements where OPNsense
+                    instances need to be re-invoked with a previously existing configuration.
+                </p>
+
+                <p>
+                    Configuration Sync happens to be a great OPNsense configuration backup solution when
+                    used by itself.
                 </p>
 
                 <p>Configuration Sync supports the following cloud storage providers:</p>
                 <ul>
-                    <li>Amazon - S3</li>
+                    <li>Amazon Web Services - S3</li>
                     <li>Google - Cloud Storage</li>
                     <li>Digital Ocean - Spaces</li>
                     <li>Other - S3 compatible endpoints</li>
                 </ul>
 
                 <p>
-                    Configuration Sync works well on OPNsense systems with MultiCLOUDsense&trade;
-                    in conjunction with DevOps tools like Terraform or Ansible to achieve
-                    instance automation to create, destroy and re-create OPNsense instances with
-                    the same system configuration.
+                    Configuration Sync uses the well known Python Boto3 library to achieve generic S3
+                    connectivity; if Boto3 can handle the S3 storage provider you should be able to use it here.
                 </p>
 
                 <p>
-                    The ability to manage OPNsense instances using DevOps automation tooling
-                    means OPNsense becomes a first-class choice for building and managing
-                    multi-cloud or other hybrid network infrastructure arrangements.
-                </p>
-
-                <p>
-                    Configuration Sync also happens to be a great OPNsense configuration backup
-                    solution when used by itself.
-                </p>
-
-                <h2>Stored Configurations</h2>
-                <p>
-                    Configuration Sync is designed to <strong>not</strong> require (or provide)
-                    any read access to the files written to the storage provider.  This means
-                    policies can be applied to the associated account API credentials that are
-                    limited to put-object and list-bucket permissions.  This in turn means the
-                    risks of API credential exposure are nicely limited.
-                </p>
-                
-                <h2>Example AWS IAM policy</h1>
-                <p>
-                    Consider the following AWS IAM policy below to restrict the resources and
-                    actions available to the AWS account associated with the API credentials
-                    used.  Of particular note is that the policy does not require <code>GetObject</code>
-                    permissions.
-                </p>
-<pre>{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [ "s3:ListBucket" ],
-            "Resource": [ "arn:aws:s3:::BUCKET_NAME" ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [ "s3:ListBucket", "s3:PutObject" ],
-            "Resource": [ "arn:aws:s3:::BUCKET_NAME/PATH_NAME/*" ]
-        }
-    ]
-}</pre>
-                <p>
-                    <strong>Note:</strong> Be sure to replace <code>BUCKET_NAME</code> and <code>PATH_NAME</code>
-                    values with your own values above.
-                </p>
-
-                <p>
-                    Similar policy arrangements are possible with other storage providers depending on the
-                    ACL functionality of the storage provider.
+                Please refer to the online documentation for the latest storage-provider configuration detail.
+                <br>
+                <a rel="noreferrer noopener" target="_blank" href="https://documentation.threatpatrols.com/opnsense/plugins/">https://documentation.threatpatrols.com/opnsense/plugins</a>
                 </p>
 
                 <h2>Metadata</h2>
                 <p>
-                    The OPNsense <code>.xml</code> configuration files written to the storage provider
-                    also have additional metadata attached to them by configsync.
+                    Each OPNsense <code>.xml</code> file object written by Configuration Sync adds extra meta-data
+                    to the stored file-object that helps confirm the OPNsense instance the file originated from.
                 </p>
 
                 <p>Metadata fields</p>
@@ -122,8 +84,8 @@
                 </ul>
 
                 <p>
-                    These values may be used to filter and select specific configuration files from
-                    the storage-provider bucket at a later time.
+                    These values are helpful in filtering and selecting specific configuration files from the
+                    storage-provider bucket at a later time.
                 </p>
 
                 <hr />
