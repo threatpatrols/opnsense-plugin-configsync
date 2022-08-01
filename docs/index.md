@@ -131,9 +131,11 @@ you are free to use it, and we'd like you to contribute improvements if you make
  * https://github.com/threatpatrols/opnsense-plugin-configsync
 
 ## Copyright
-Copyright &copy; 2022 Threat Patrols Pty Ltd &lt;contact@threatpatrols.com&gt;
+* Copyright &copy; 2022 Threat Patrols Pty Ltd &lt;contact@threatpatrols.com&gt;
+* Copyright &copy; 2018 Verb Networks Pty Ltd &lt;contact@verbnetworks.com&gt;
+* Copyright &copy; 2018 Nicholas de Jong &lt;me@nicholasdejong.com&gt;
 
 All rights reserved.
 
 ## License
-Distributed under the [Parity Public License, Version 7.0.0](https://paritylicense.com/versions/7.0.0)
+BSD-2-Clause - see LICENSE file for full details.
