@@ -25,12 +25,6 @@
 """
 
 import random
-import logging
-
-from configsync.vars import __title__
-
-
-logger = logging.getLogger(__title__)
 
 
 def random_float(minimum_value=0.0, maximum_value=1.0, decimal_places=4) -> float:
