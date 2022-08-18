@@ -79,47 +79,27 @@
                     connectivity; if Boto3 can handle the S3 storage provider you should be able to use it here.
                 </p>
 
-                <p>
-                Please refer to the online documentation for the latest storage-provider configuration detail.
-                <br>
-                <a rel="noreferrer noopener" target="_blank" href="https://documentation.threatpatrols.com/opnsense/plugins/">https://documentation.threatpatrols.com/opnsense/plugins</a>
-                </p>
-
-                <h2>Metadata</h2>
-                <p>
-                    Each OPNsense <code>.xml</code> file object written by Configuration Sync adds extra meta-data
-                    to the stored file-object that helps confirm the OPNsense instance the file originated from.
-                </p>
-
-                <p>Metadata fields</p>
-                <ul>
-                    <li><code>filetype</code> - always "opnsense-config"</li>
-                    <li><code>mtime</code> - the last modified timestamp of the OPNsense config file</li>
-                    <li><code>bytes</code> - the file size in bytes of the OPNsense config file</li>
-                    <li><code>md5</code> - the md5-digest of the OPNsense config file</li>
-                    <li><code>hostid</code> - the unique host-id of the OPNsense system</li>
-                    <li><code>hostname</code> - the hostname of the OPNsense system</li>
-                </ul>
-
-                <p>
-                    These values are helpful in filtering and selecting specific configuration files from the
-                    storage-provider bucket at a later time.
-                </p>
-
                 <hr />
-                
-                <h1>Additional Documentation</h1>
+
+                <h2>Documentation</h2>
                 <ul>
-                    <li><a rel="noreferrer noopener" target="_blank" href="https://documentation.threatpatrols.com/opnsense/plugins/">https://documentation.threatpatrols.com/opnsense/plugins</a></li>
+                    <li><a rel="noreferrer noopener" target="_blank" href="https://documentation.threatpatrols.com/opnsense/plugins/configsync/">https://documentation.threatpatrols.com/opnsense/plugins/configsync</a></li>
                 </ul>
 
-                <h1>Copyright</h1>
+                <h2>Source</h2>
                 <ul>
-                    <li><a rel="noreferrer noopener" target="_blank" href="https://github.com/threatpatrols/opnsense-plugin-configsync">Configuration Sync</a> (c) 2022 <a rel="noreferrer noopener" target="_blank" href="https://www.threatpatrols.com">Threat Patrols Pty Ltd</a></li>
+                    <li><a rel="noreferrer noopener" target="_blank" href="https://github.com/threatpatrols/opnsense-plugin-configsync">https://github.com/threatpatrols/opnsense-plugin-configsync</a></li>
                 </ul>
 
-                <h1>License</h1>
-                <p>BSD-2-Clause - see LICENSE file for full details.</p>
+                <h2>Copyright</h2>
+                <ul>
+                    <li>Configuration Sync (c) 2022 <a rel="noreferrer noopener" target="_blank" href="https://www.threatpatrols.com">Threat Patrols Pty Ltd</a></li>
+                </ul>
+
+                <h2>License</h2>
+                <ul>
+                    <li>BSD-2-Clause - see LICENSE file for full details.</li>
+                </ul>
                 <p></p>
 
             </div>

@@ -4,13 +4,13 @@ synchronize the OPNsense system configuration `.xml` files to an (S3
 compatible) cloud-storage provider.  Actions for `configsync` are triggered 
 by an OPNsense syshook-config event.
 
-Configuration Sync is well-suited to DevOps automation arrangements where OPNsense 
-instances need to be re-invoked with a previously existing configuration.
+![Configuration Sync Settings](assets/configsync-screenshot01.png){ align=right }
+
+Configuration Sync is well-suited to DevOps automation arrangements where OPNsense
+instances are re-invoked with a previously existing configuration.
 
 Configuration Sync happens to be a great OPNsense configuration backup solution when 
 used by itself.
-
-![Configuration Sync Settings](assets/configsync-screenshot01.png){ align=right }
 
 Configuration Sync supports the following cloud storage providers:-
 
@@ -28,6 +28,9 @@ Installation is possible via the Threat Patrols repo.  Refer to the documentatio
 for details on adding our repo to your OPNsense instance:-
 
  * https://documentation.threatpatrols.com/opnsense/repo
+
+Once the Threat Patrols repo has been added to your OPNsense system you can install 
+Configuration Sync directly from the OPNsense Plugins web-interface.
 
 ## General Settings Recommendations
  * __Storage Path__ - recommended to use different storage paths per OPNsense instance 
@@ -124,10 +127,10 @@ These fields are
 These values are helpful in filtering and selecting specific configuration files from the 
 storage-provider bucket at a later time.
 
-## Open Source
-Configuration Sync is open-source with a copy-left [license](#license) that means 
-you are free to use it, and we'd like you to contribute improvements if you make them.
+## Documentation
+ * https://documentation.threatpatrols.com/opnsense/plugins/configsync/
 
+## Source
  * https://github.com/threatpatrols/opnsense-plugin-configsync
 
 ## Copyright
@@ -138,4 +141,4 @@ you are free to use it, and we'd like you to contribute improvements if you make
 All rights reserved.
 
 ## License
-BSD-2-Clause - see LICENSE file for full details.
+* BSD-2-Clause - see LICENSE file for full details.
