@@ -65,12 +65,8 @@ class FilesController extends ApiControllerBase
             }
 
             $backend = new Backend();
-            $configd_run = sprintf(
-                'configsync list_synced_system_configs --filter=%s',
-                escapeshellarg($filter)
-            );
-            $backend_response = json_decode(trim($backend->configdRun($configd_run)), true);
-
+            $configd_run = sprintf('configsync list_synced_system_configs --filter=%s', escapeshellarg($filter));
+            $backend_response = @json_decode(trim($backend->configdRun($configd_run)), true);
             if ($backend_response['status'] !== 'success') {
                 return $response;
             }

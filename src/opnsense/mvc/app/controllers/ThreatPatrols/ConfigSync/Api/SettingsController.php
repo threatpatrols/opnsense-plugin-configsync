@@ -37,6 +37,20 @@ use ThreatPatrols\ConfigSync\ConfigSync;
 
 class SettingsController extends ApiControllerBase
 {
+    public function reloadAction()
+    {
+        $response = array("status" => "fail", "message" => "Invalid request");
+
+        if ($this->request->isPost()) {
+            $backend = new Backend();
+            $backend_result = trim($backend->configdRun('template reload ThreatPatrols/ConfigSync'));
+            if (true === strpos($backend_result, 'OK')) {
+                $response = array("status" => "success", "message" => "Template reload okay");
+            }
+        }
+        return $response;
+    }
+
     public function getAction()
     {
         $response = array();
@@ -92,7 +106,7 @@ class SettingsController extends ApiControllerBase
                     escapeshellarg($data['settings']['storage_provider_key_secret'])    # key_secret [5]
                 );
 
-                $response = json_decode(trim($backend->configdRun($configd_run)), true);
+                $response = @json_decode(trim($backend->configdRun($configd_run)), true);
                 if (empty($response)) {
                     $response = array(
                         "status" => "fail",
@@ -120,7 +134,7 @@ class SettingsController extends ApiControllerBase
     private function getVersion()
     {
         $backend = new Backend();
-        $response = json_decode(trim($backend->configdRun("configsync get_version")), true);
+        $response = json_decode(trim($backend->configdRun("configsync version")), true);
         return $response["version"];
     }
 

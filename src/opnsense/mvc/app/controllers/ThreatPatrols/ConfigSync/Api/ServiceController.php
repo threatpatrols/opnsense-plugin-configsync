@@ -35,36 +35,27 @@ use OPNsense\Core\Backend;
 
 class ServiceController extends ApiControllerBase
 {
-    public function reloadAction()
+    public function syncAllAction()
     {
         $response = array("status" => "fail", "message" => "Invalid request");
-
         if ($this->request->isPost()) {
             $backend = new Backend();
-            $backend_result = trim($backend->configdRun('template reload ThreatPatrols/ConfigSync'));
-            if (true === strpos($backend_result, 'OK')) {
-                $response = array("status" => "success", "message" => "Template reload okay");
-            }
+            return @json_decode(trim($backend->configdRun('configsync sync_all_system_configs')), true);
+        }
+        return $response;
+    }
+
+    public function syncCurrentAction()
+    {
+        $response = array("status" => "fail", "message" => "Invalid request");
+        if ($this->request->isPost()) {
+            $backend = new Backend();
+            return @json_decode(trim($backend->configdRun('configsync sync_current_system_config')), true);
         }
         return $response;
     }
 
     public function statusAction()
-    {
-        return array();
-    }
-
-    public function startAction()
-    {
-        return array();
-    }
-
-    public function restartAction()
-    {
-        return array();
-    }
-
-    public function stopAction()
     {
         return array();
     }

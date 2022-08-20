@@ -29,7 +29,6 @@
 <script>
     
     function updateGridFilesTable() {
-    
         $("#grid-files").UIBootgrid(
             {   search:'/api/configsync/files/list',
                 options:{
@@ -42,7 +41,6 @@
     }
 
     $(document).ready(function() {
-        updateServiceControlUI('configsync');
         updateGridFilesTable();
     });
 
@@ -58,11 +56,10 @@
             <table id="grid-files" class="table table-condensed table-hover table-striped table-responsive">
                 <thead>
                 <tr>
-                    <th data-column-id="timestamp_created" data-width="14em" data-type="string" data-sortable="true" data-visible="true">{{ lang._('Filename Timestamp') }}</th>
+                    <th data-column-id="timestamp_created" data-order="desc" data-width="14em" data-type="string" data-sortable="true" data-visible="true">{{ lang._('Filename Timestamp') }}</th>
                     <th data-column-id="timestamp_synced" data-width="14em" data-type="string" data-sortable="true" data-visible="true">{{ lang._('Storage Timestamp') }}</th>
                     <th data-column-id="path" data-type="string" data-sortable="true" data-visible="true">{{ lang._('Storage Provider Path') }}</th>
                     <th data-column-id="storage_size" data-width="8em" data-type="string" data-sortable="true" data-visible="true">{{ lang._('Storage Size') }}</th>
-
                     <th data-column-id="storage_class" data-type="string" data-sortable="true" data-visible="false">{{ lang._('Storage Class') }}</th>
                     <th data-column-id="storage_etag" data-type="string" data-sortable="true" data-visible="false">{{ lang._('Storage ETag') }}</th>
                 </tr>
@@ -75,7 +72,6 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            &nbsp;
         </div>
     </div>
 </div>

@@ -150,9 +150,9 @@
                 formid = 'frm_Settings',
                 callback_ok = function(){
                     $("#responseMsg").html("{{ lang._('Configuration Sync service settings saved') }}.");
-                    ajaxCall(url = "/api/configsync/service/reload", sendData = {}, callback = function(data, status) {
+                    ajaxCall(url = "/api/configsync/settings/reload", sendData = {}, callback = function(data, status) {
                         $("#responseMsg").html("{{ lang._('Configuration Sync service settings saved and reloaded') }}.");
-                        ajaxCall(url = "/api/configsync/service/restart", sendData = {}, callback = function(data, status) {
+                        ajaxCall(url = "/api/configsync/service/sync_all", sendData = {}, callback = function(data, status) {
                             updateServiceControlUI('configsync');
                         });
                     });

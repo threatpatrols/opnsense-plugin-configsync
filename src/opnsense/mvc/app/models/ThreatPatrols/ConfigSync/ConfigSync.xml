@@ -1,6 +1,6 @@
 <model>
     <mount>//OPNsense/ConfigSync</mount>
-    <description>Threat Patrols "Configuration Sync" application</description>
+    <description>Threat Patrols "Configuration Sync" plugin for OPNsense</description>
     <version>0.1.0</version>
     <items>
         <settings>

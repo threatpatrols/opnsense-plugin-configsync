@@ -28,19 +28,13 @@
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-function configsync_enabled()
-{
-    $model_configsync = new \ThreatPatrols\ConfigSync\ConfigSync();
-    return $model_configsync->settings->enabled->__toString() == "1";
-}
+use ThreatPatrols\ConfigSync\ConfigSync;
 
 function configsync_syslog()
 {
     $logfacilities = array();
-
     $logfacilities['configsync'] = array(
         'facility' => array('configsync'),
     );
-
     return $logfacilities;
 }
