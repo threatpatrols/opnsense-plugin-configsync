@@ -10,4 +10,4 @@ Configuration Sync is well-suited to DevOps automation arrangements where OPNsen
 
 Configuration Sync happens to be a great OPNsense configuration backup solution when used by itself.
 
-WWW: https://github.com/threatpatrols/opnsense-plugin-configsync
+WWW: https://documentation.threatpatrols.com/opnsense/plugins/configsync/
