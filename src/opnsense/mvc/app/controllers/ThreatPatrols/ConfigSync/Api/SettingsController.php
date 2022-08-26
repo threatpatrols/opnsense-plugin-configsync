@@ -58,7 +58,6 @@ class SettingsController extends ApiControllerBase
             $model_ConfigSync = new ConfigSync();
             $response['ConfigSync'] = $model_ConfigSync->getNodes();
             $response['ConfigSync']['settings']['system_host_id'] = $this->getHostid();
-            $response['ConfigSync']['settings']['configsync_version'] = $this->getVersion();
         }
         return $response;
     }
@@ -129,13 +128,6 @@ class SettingsController extends ApiControllerBase
             return trim(file_get_contents('/etc/hostid'));
         }
         return '00000000-0000-0000-0000-000000000000';
-    }
-
-    private function getVersion()
-    {
-        $backend = new Backend();
-        $response = json_decode(trim($backend->configdRun("configsync version")), true);
-        return $response["version"];
     }
 
     private function unpackValidationMessages($model, $namespace)

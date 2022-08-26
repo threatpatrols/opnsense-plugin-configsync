@@ -30,10 +30,15 @@
 
 namespace ThreatPatrols\ConfigSync;
 
+use OPNsense\Core\Backend;
+
 class SettingsController extends \OPNsense\Base\IndexController
 {
     public function indexAction()
     {
+        $backend = new Backend();
+        $response = json_decode(trim($backend->configdRun("configsync version")), true);
+        $this->view->configsync_version = $response["version"];
         $this->view->pick('ThreatPatrols/ConfigSync/settings');
         $this->view->settingsForm = $this->getForm("settings");
     }

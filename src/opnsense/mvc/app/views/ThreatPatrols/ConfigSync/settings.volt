@@ -50,15 +50,15 @@
             <div  class="col-md-12">
                 <h1>Configuration Sync</h1>
                 <p>
-                    Configuration Sync (configsync) is an OPNsense plugin designed to one-way
-                    synchronize the OPNsense system configuration <code>.xml</code>code> files to an (S3
-                    compatible) cloud-storage provider.  Actions for configsync are triggered
-                    by an OPNsense syshook-config event.
+                    Configuration Sync (configsync) is an OPNsense plugin designed to one-way synchronize
+                    the OPNsense system configuration <code>.xml</code> files to an (S3 compatible) cloud-storage
+                    provider. Actions for configsync are automatically triggered by an OPNsense syshook-config event.
                 </p>
 
                 <p>
-                    Configuration Sync is well-suited to DevOps automation arrangements where OPNsense
-                    instances need to be re-invoked with a previously existing configuration.
+                    Configuration Sync is well-suited to DevOps automation situations where OPNsense
+                    instances are re-invoked with a previously existing configuration - such as when using
+                    MultiCLOUDsense to handle the bootstrapping of an OPNsense cloud instance.
                 </p>
 
                 <p>
@@ -79,11 +79,21 @@
                     connectivity; if Boto3 can handle the S3 storage provider you should be able to use it here.
                 </p>
 
+                <h2>Version</h2>
+                <ul>
+                    <li>{{ configsync_version }}</li>
+                </ul>
+
                 <hr />
 
                 <h2>Documentation</h2>
                 <ul>
                     <li><a rel="noreferrer noopener" target="_blank" href="https://documentation.threatpatrols.com/opnsense/plugins/configsync/">https://documentation.threatpatrols.com/opnsense/plugins/configsync</a></li>
+                </ul>
+
+                <h2>Issues</h2>
+                <ul>
+                    <li><a rel="noreferrer noopener" target="_blank" href="https://github.com/threatpatrols/opnsense-plugin-configsync/issues">https://github.com/threatpatrols/opnsense-plugin-configsync/issues</a></li>
                 </ul>
 
                 <h2>Source</h2>
@@ -92,15 +102,15 @@
                 </ul>
 
                 <h2>Copyright</h2>
-                <ul>
-                    <li>Configuration Sync (c) 2022 <a rel="noreferrer noopener" target="_blank" href="https://www.threatpatrols.com">Threat Patrols Pty Ltd</a></li>
-                </ul>
+                <p>
+                    Configuration Sync (c) 2022 <a rel="noreferrer noopener" target="_blank" href="https://www.threatpatrols.com">Threat Patrols Pty Ltd</a>
+                </p>
+                <p>
+                    All rights reserved.
+                </p>
 
                 <h2>License</h2>
-                <ul>
-                    <li>BSD-2-Clause - see LICENSE file for full details.</li>
-                </ul>
-                <p></p>
+                <p>BSD-2-Clause - see source LICENSE file for details.</p>
 
             </div>
         </div>
@@ -108,7 +118,7 @@
 </div>
 
 <style>
-    #ConfigSync\.settings\.system_host_id, #ConfigSync\.settings\.configsync_version {
+    #ConfigSync.settings.system_host_id {
         line-height: 34px;
         display: inline-block;
         vertical-align: middle;
