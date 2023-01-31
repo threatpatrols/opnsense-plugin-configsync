@@ -26,6 +26,7 @@
 import os
 import logging
 import boto3
+from botocore.client import Config as BotoConfig
 
 from configsync.exceptions import ConfigSyncException
 
@@ -65,8 +66,6 @@ class StorageProviderBoto3Compatible:
             if config_setting in kwargs and kwargs[config_setting]:
                 setattr(self, config_setting, kwargs[config_setting])
 
-        self.endpoint = self.__endpoint_url(provider=self.provider, bucket=self.bucket, url=self.endpoint)
-
     def test_parameters(self, **kwargs):
         """
         Sets up StorageProviderBoto3Compatible() using the function-args parameters and then attempts to
@@ -80,8 +79,6 @@ class StorageProviderBoto3Compatible:
         # Setup this test instance of StorageProviderBoto3Compatible()
         for config_setting in __configsync_config_settings__:
             setattr(self, config_setting, kwargs[config_setting])
-
-        self.endpoint = self.__endpoint_url(provider=self.provider, bucket=self.bucket, url=self.endpoint)
 
         # config-test.xml
         config_files = [
@@ -266,7 +263,6 @@ class StorageProviderBoto3Compatible:
             raise ConfigSyncException("Unexpected value storage_provider:path is None")
 
         logger.debug(f"__put_object() - provider={self.provider}")
-        logger.debug(f"__put_object() - endpoint={self.endpoint}")
         logger.debug(f"__put_object() - client_params[Key]={client_params['Key']}")
 
         if content_type:
@@ -278,10 +274,7 @@ class StorageProviderBoto3Compatible:
         if object_tags:
             client_params["Metadata"] = object_tags
 
-        boto_client = boto3.client(
-            "s3", aws_access_key_id=self.key_id, aws_secret_access_key=self.key_secret, endpoint_url=self.endpoint
-        )
-
+        boto_client = self.__boto3_s3_client()
         response = boto_client.put_object(**client_params)
 
         status_code = None
@@ -327,11 +320,8 @@ class StorageProviderBoto3Compatible:
         if continuation_token:
             client_params["ContinuationToken"] = continuation_token
 
-        client = boto3.client(
-            "s3", aws_access_key_id=self.key_id, aws_secret_access_key=self.key_secret, endpoint_url=self.endpoint
-        )
-
-        response = client.list_objects_v2(**client_params)
+        boto_client = self.__boto3_s3_client()
+        response = boto_client.list_objects_v2(**client_params)
 
         file_objects = {}
         if "Contents" in response:
@@ -364,38 +354,46 @@ class StorageProviderBoto3Compatible:
             "data": file_objects,
         }
 
-    def __endpoint_url(self, provider=None, bucket=None, url=None):
+    def __boto3_s3_client(self):
+
+        boto_config = BotoConfig(signature_version="s3v4")
+
+        return boto3.client(
+            "s3",
+            aws_access_key_id=self.key_id,
+            aws_secret_access_key=self.key_secret,
+            endpoint_url=self.__endpoint_url(),
+            config=boto_config,
+        )
+
+    def __endpoint_url(self):
         """
         Generate an endpoint url for the respective boto3 compatible storage_provider
-
-        :param provider:
-        :param bucket:
-        :param url:
         :return:
         """
 
-        if url:
-            return url
+        if self.endpoint:
+            return self.endpoint
 
-        if not provider and not bucket and not url:  # occurs when using the test_parameters action
+        if not self.provider and not self.bucket and not self.endpoint:  # occurs when using the test_parameters action
             return None
 
-        if not provider or not bucket:
+        if not self.provider or not self.bucket:
             raise ConfigSyncException("Both provider and bucket values must be set if endpoint:url is not set")
 
-        if provider.startswith("aws"):
-            return f"https://{bucket}.s3.amazonaws.com"
+        if self.provider.startswith("aws"):
+            return None
 
-        elif provider.startswith("google"):
+        elif self.provider.startswith("google"):
             return "https://storage.googleapis.com"
 
-        elif provider.startswith("digitalocean"):
+        elif self.provider.startswith("digitalocean"):
             raise ConfigSyncException("DigitalOcean must be setup using endpoint:url")
 
-        elif provider.startswith("other"):
+        elif self.provider.startswith("other"):
             raise ConfigSyncException("Other S3 compatible storage providers must be setup using endpoint:url")
 
-        raise ConfigSyncException("Unknown provider requested", provider)
+        raise ConfigSyncException("Unknown provider requested", self.provider)
 
     def __response_to_logger(self, action, response):
         if "message" in response and "status" in response:
