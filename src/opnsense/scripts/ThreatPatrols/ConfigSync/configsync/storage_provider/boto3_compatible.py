@@ -365,6 +365,7 @@ class StorageProviderBoto3Compatible:
             aws_secret_access_key=self.key_secret,
             endpoint_url=self.__endpoint_url(),
             config=boto_config,
+            verify=True,
         )
 
     def __endpoint_url(self):
